@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify OTP</title>
+
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background: #eef2ff;
+    }
+
+    .otp-box {
+      max-width: 400px;
+      margin: 8% auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="otp-box">
+    <h3 class="text-center fw-bold mb-3">Verify OTP</h3>
+    <p class="text-center text-muted">Enter the OTP sent to your email</p>
+
+    <form id="verifyOtpForm">
+
+      <!-- store email from URL -->
+      <input type="hidden" id="email" value="{{ email }}">
+
+      <input type="text" id="otp" class="form-control mb-3" placeholder="Enter OTP" required>
+
+      <button class="btn btn-primary w-100">Verify</button>
+    </form>
+
+    <p class="mt-3 text-center text-danger" id="otpError"></p>
+  </div>
+
+  <script>
+    document.getElementById("verifyOtpForm").onsubmit = async function (e) {
+      e.preventDefault();
+
+      const otp = document.getElementById("otp").value;
+      const email = document.getElementById("email").value;
+
+      const response = await fetch("http://127.0.0.1:8000/verify-otp/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, otp: otp })
+      });
+
+      const result = await response.json();
+      console.log(result);   // helpful debugging
+
+      if (result.status === "success") {
+        alert("OTP Verified! Redirecting...");
+        window.location.href = "{% url 'login_page' %}";
+      } else {
+        document.getElementById("otpError").innerText = result.message;
+      }
+    };
+  </script>
+
+</body>
+</html>

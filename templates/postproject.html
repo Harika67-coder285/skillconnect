@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Post a Project - SkillConnect</title>
+
+<link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+
+  <style>
+    body {
+      background: #f5f7fb;
+      padding-top: 90px; /* Header space */
+    }
+
+    .section-box {
+      background: #fff;
+      padding: 35px;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(14, 30, 37, 0.06);
+    }
+
+    .form-control, .form-select {
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+
+    .btn-submit {
+      background: #0d83fd;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .btn-submit:hover {
+      background: #006fe0;
+    }
+
+    .page-title {
+      font-weight: 700;
+      font-size: 28px;
+    }
+    
+    .required-star {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/logo.png" alt="SkillConnect Logo" />
+        <h1 class="sitename">SkillConnect</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+
+          <!-- Categories Dropdown -->
+          <li class="dropdown">
+            <a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="browse.html?cat=webdev">Web Development</a></li>
+              <li><a href="browse.html?cat=mobile">Mobile Apps</a></li>
+              <li><a href="browse.html?cat=datascience">Data Science</a></li>
+              <li><a href="browse.html?cat=design">Graphic & UI/UX Design</a></li>
+              <li><a href="browse.html?cat=writing">Content Writing</a></li>
+              <li><a href="browse.html?cat=marketing">Digital Marketing</a></li>
+              <li><a href="browse.html?cat=video">Video Editing</a></li>
+              <li><a href="browse.html?cat=ai">AI & Machine Learning</a></li>
+              <li><a href="browse.html?cat=business">Business & Finance</a></li>
+            </ul>
+          </li>
+
+          <li><a href="browse.html">Find Freelancers</a></li>
+          
+
+          <li><a href="howitworks.html">How It Works</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+
+          <!-- Login / Signup -->
+          <li><a href="login.html" class="btn-getstarted" style="padding:10px 20px;">Login</a></li>
+          <li><a href="signup.html" class="btn-getstarted" style="padding:10px 20px">Sign Up</a></li>
+        </ul>
+
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="container">
+
+    <div class="my-4">
+      <h2 class="page-title">Post a New Project</h2>
+      <p class="text-muted">Describe your project and get proposals from top freelancers.</p>
+    </div>
+
+    <div class="section-box">
+      <form id="projectForm">
+
+        <!-- Project Title -->
+        <div class="mb-4">
+          <label class="form-label">Project Title <span class="required-star">*</span></label>
+          <input type="text" class="form-control" placeholder="e.g. Build a modern portfolio website" required>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-4">
+          <label class="form-label">Category <span class="required-star">*</span></label>
+          <select class="form-select" required>
+            <option value="">Select Category</option>
+            <option>Web Development</option>
+            <option>Mobile App Development</option>
+            <option>Graphic & UI/UX Design</option>
+            <option>Content Writing</option>
+            <option>AI / ML</option>
+            <option>Data Science</option>
+            <option>Video Editing</option>
+            <option>Marketing</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="form-label">Project Description <span class="required-star">*</span></label>
+          <textarea class="form-control" rows="6" placeholder="Describe your requirements..." required></textarea>
+        </div>
+
+        <!-- Skills Required -->
+        <div class="mb-4">
+          <label class="form-label">Skills Required (comma separated)</label>
+          <input type="text" class="form-control" placeholder="e.g. React, Node.js, CSS, UI Design">
+        </div>
+
+        <!-- Budget Type -->
+        <div class="mb-4">
+          <label class="form-label">Budget Type <span class="required-star">*</span></label>
+          <select class="form-select" id="budgetType" onchange="toggleBudget()">
+            <option value="fixed">Fixed Price</option>
+            <option value="hourly">Hourly Rate</option>
+          </select>
+        </div>
+
+        <!-- Fixed Budget -->
+        <div class="mb-4" id="fixedBudget">
+          <label class="form-label">Budget (₹)</label>
+          <input type="number" class="form-control" placeholder="e.g. 10000">
+        </div>
+
+        <!-- Hourly Budget -->
+        <div class="mb-4" id="hourlyBudget" style="display:none;">
+          <label class="form-label">Hourly Rate (₹)</label>
+          <input type="number" class="form-control" placeholder="e.g. 200">
+        </div>
+
+        <!-- Duration -->
+        <div class="mb-4">
+          <label class="form-label">Expected Duration</label>
+          <select class="form-select">
+            <option>1-3 days</option>
+            <option>1 week</option>
+            <option>2 weeks</option>
+            <option>1 month</option>
+            <option>More than 1 month</option>
+          </select>
+        </div>
+
+        <!-- File Upload -->
+        <div class="mb-4">
+          <label class="form-label">Upload any reference files</label>
+          <input type="file" class="form-control">
+        </div>
+
+        <!-- Submit -->
+        <div class="text-end">
+          <button type="submit" class="btn-submit">Submit Project</button>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="padding:40px 0; text-align:center; color:#666;">
+    © <strong>SkillConnect</strong> • Post Project Page
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Toggle Budget Inputs
+    function toggleBudget() {
+      let type = document.getElementById("budgetType").value;
+      document.getElementById("fixedBudget").style.display =
+        type === "fixed" ? "block" : "none";
+      document.getElementById("hourlyBudget").style.display =
+        type === "hourly" ? "block" : "none";
+    }
+
+    // Header Login/Logout logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      const user = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
+      const loginLink = document.querySelector('a[href="login.html"]');
+      const signupLink = document.querySelector('a[href="signup.html"]');
+
+      if (isLoggedIn && user.name) {
+        // Remove Sign Up button
+        if (signupLink) signupLink.remove();
+
+        // Change Login button to Logout
+        if (loginLink) {
+          loginLink.textContent = "Logout";
+          loginLink.href = "#";
+          loginLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("loggedInUser");
+            window.location.reload();
+          });
+        }
+      }
+    });
+
+    // Project Form Submission
+    document.getElementById("projectForm").onsubmit = function (e) {
+      e.preventDefault();
+      alert("Your project has been submitted!");
+      document.getElementById("projectForm").reset();
+      document.getElementById("fixedBudget").style.display = "block";
+      document.getElementById("hourlyBudget").style.display = "none";
+    };
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,289 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Dashboard - SkillConnect</title>
+<link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+<link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <!-- Optional: your main CSS (keeps consistent look) -->
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f5f7ff;
+      padding-top: 97px; /* Push content below fixed header */
+    }
+
+    a[href="{% url 'dashboard' %}"] {
+      display: inline-block !important;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: #ffffff;
+      padding: 25px;
+      border-right: 1px solid #d8d8d8;
+      position: sticky;
+      top: 80px; /* sticks below header */
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      color: #333;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover,
+    .sidebar .active {
+      background: #4154f1;
+      color: #fff !important;
+    }
+
+    .dashboard-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 25px;
+    }
+
+    .welcome-box {
+      background: linear-gradient(135deg, #4154f1, #6a7bff);
+      padding: 40px;
+      border-radius: 20px;
+      color: #fff;
+      margin-bottom: 30px;
+    }
+
+    .welcome-box h2 {
+      font-weight: 700;
+    }
+
+    /* Profile link in header */
+    #profile-link img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+    }
+
+    #profile-link {
+      align-items: center;
+      font-weight: 500;
+      color: #212529;
+      text-decoration: none;
+    }
+
+    #profile-link:hover {
+      text-decoration: none;
+      color: #4154f1;
+    }
+
+    /* Profile avatar in header */
+    .profile-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .profile-avatar img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      display: block;
+    }
+
+    /* Header logout button */
+    #header-logout a {
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #4f7be0;
+      font-weight: 500;
+    }
+
+    #header-logout a:hover {
+      background-color: #4f7be0;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <!-- Logo -->
+      <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="{% static 'img/logo.png'%}" alt="SkillConnect Logo" />
+        <h1 class="sitename">SkillConnect</h1>
+      </a>
+
+      <!-- Navigation -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'home' %}" class="active">Home</a></li>
+
+          <!-- Categories Dropdown -->
+          <li class="dropdown">
+      <a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+      <ul>
+        <li><a href="{% url 'browse' %}?cat=webdev">Web Development</a></li>
+        <li><a href="{% url 'browse' %}?cat=mobile">Mobile Apps</a></li>
+        <li><a href="{% url 'browse' %}?cat=datascience">Data Science</a></li>
+        <li><a href="{% url 'browse' %}?cat=design">Graphic & UI/UX Design</a></li>
+        <li><a href="{% url 'browse' %}?cat=writing">Content Writing</a></li>
+        <li><a href="{% url 'browse' %}?cat=marketing">Digital Marketing</a></li>
+        <li><a href="{% url 'browse' %}?cat=video">Video Editing</a></li>
+        <li><a href="{% url 'browse' %}?cat=ai">AI & Machine Learning</a></li>
+        <li><a href="{% url 'browse' %}?cat=business">Business & Finance</a></li>
+      </ul>
+    </li>
+
+          <li><a href="{% url 'browse' %}">Find Freelancers</a></li>
+          <li><a href="{% url 'how_it_works' %}">How It Works</a></li>
+
+          <!-- Login / Sign Up -->
+          <li id="login-link"><a href="{% url 'login_page' %}" class="btn-getstarted">Login</a></li>
+          <li id="signup-link"><a href="{% url 'register_page' %}" class="btn-getstarted">Sign Up</a></li>
+
+          <!-- Profile Avatar -->
+          <li id="profile-link" style="display:none;">
+            <a href="{% url 'dashboard' %}" class="profile-avatar">
+              <img id="profile-avatar" src="{% static 'img/avatar-1.webp'%}" alt="Profile" />
+            </a>
+          </li>
+
+          <!-- Header Logout -->
+          <li id="header-logout" style="display:none;">
+            <a href="#" onclick="logoutHeader()">Logout</a>
+          </li>
+        </ul>
+
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Content -->
+  <div class="container-fluid">
+    <div class="row">
+
+      <!-- Sidebar -->
+      <div class="col-md-3 sidebar">
+        
+
+        <a href="#" class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="#"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
+        <a href="#"><i class="bi bi-chat-dots me-2"></i> Messages</a>
+        <a href="#"><i class="bi bi-gear me-2"></i> Settings</a>
+        <a href="#" onclick="logoutHeader()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 p-4">
+
+        <!-- Welcome Box -->
+        <div class="welcome-box">
+          <h2>Hello, <span id="username">User</span> 👋</h2>
+          <p>Welcome to your SkillConnect dashboard.</p>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="row">
+
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <h4 class="fw-bold">My Active Projects</h4>
+              <p class="text-muted">View and manage your ongoing projects.</p>
+              <button class="btn btn-primary">View Projects</button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <h4 class="fw-bold">Browse Freelancers</h4>
+              <p class="text-muted">Hire top freelancers for your work.</p>
+              <a href="{% url 'browse' %}" class="btn btn-primary">Browse Now</a>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <h4 class="fw-bold">Messages</h4>
+              <p class="text-muted">Chat with freelancers and clients.</p>
+              <button class="btn btn-primary">Open Messages</button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <h4 class="fw-bold">Account Settings</h4>
+              <p class="text-muted">Manage your profile & preferences.</p>
+              <button class="btn btn-primary">Edit Settings</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+
+  <script>
+    // Check if user is logged in
+    let isLoggedIn = localStorage.getItem("isLoggedIn");
+    let user = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
+    if (!isLoggedIn || !user.name) {
+      // Not logged in: optionally redirect to login
+      window.location.href = "{% url 'login_page' %}";
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        // Show profile avatar and username
+        const profileLink = document.getElementById("profile-link");
+        const profileAvatar = document.getElementById("profile-avatar");
+        const loginLink = document.getElementById("login-link");
+        const signupLink = document.getElementById("signup-link");
+        const headerLogout = document.getElementById("header-logout");
+        const username = document.getElementById("username");
+
+        if (profileLink) profileLink.style.display = "flex";
+        if (profileAvatar && user.avatar) profileAvatar.src = user.avatar;
+        if (headerLogout) headerLogout.style.display = "block";
+        if (loginLink) loginLink.style.display = "none";
+        if (signupLink) signupLink.style.display = "none";
+        if (username) username.innerText = user.name;
+      });
+    }
+
+    // Logout function
+    function logoutHeader() {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "{% url 'login_page' %}";
+    }
+  </script>
+
+</body>
+</html>
