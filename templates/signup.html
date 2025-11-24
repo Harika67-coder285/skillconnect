@@ -1,4 +1,4 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,221 +8,152 @@
   <title>Sign Up - SkillConnect</title>
 
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-
-<link href="{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
   <style>
-    body {
-      background: #f2f6ff;
-      overflow-x: hidden;
-      padding-top: 60px;
-    }
-
-    .signup-wrapper {
-      max-width: 1000px;
-      margin: 5% auto;
-      background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      overflow: hidden !important;
-    }
-
-    .signup-left {
-      background: linear-gradient(135deg, #4154f1 0%, #6576ff 100%);
-      padding: 40px;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: center;
-      transition: justify-content 0.3s;
-    }
-
-    .signup-left img {
-      width: 100%;
-      max-width: 400px;
-      margin-top: 20px;
-      height: auto;
-    }
-
-    .signup-right {
-      padding: 40px 50px;
-    }
-
-    .btn-primary {
-      background-color: #4154f1;
-      border-color: #4154f1;
-    }
-
-    .btn-primary:hover {
-      background-color: #3244d5;
-    }
-
-    .home-btn {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 999;
-    }
-
-    /* Toast container top center */
-    .toast-container {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1055;
-    }
-
-    @media (max-width: 992px) {
-      .signup-wrapper {
-        margin: 20px;
-      }
-
-      .signup-left,
-      .signup-right {
-        padding: 30px 20px;
-      }
-
-      .signup-left img {
-        max-width: 300px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .signup-left img {
-        max-width: 250px;
-        margin: 20px auto 0;
-        display: block;
-      }
-
-      .signup-wrapper {
-        border-radius: 12px;
-      }
-    }
+    body { background: #f2f6ff; overflow-x: hidden; padding-top: 60px; }
+    .signup-wrapper { max-width: 1000px; margin: 5% auto; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden !important; }
+    .signup-left { background: linear-gradient(135deg,#4154f1 0%,#6576ff 100%); padding: 40px; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; transition:justify-content 0.3s; }
+    .signup-left img { width: 100%; max-width: 400px; margin-top: 20px; height:auto; }
+    .signup-right { padding:40px 50px; }
+    .btn-primary { background-color: #4154f1; border-color: #4154f1; }
+    .btn-primary:hover { background-color:#3244d5; }
+    .home-btn { position:fixed; top:15px; right:15px; z-index:999; }
+    .toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1055; }
+    @media (max-width:992px) { .signup-wrapper { margin:20px; } .signup-left,.signup-right { padding:30px 20px; } .signup-left img { max-width:300px; } }
+    @media (max-width:576px) { .signup-left img { max-width:250px; margin:20px auto 0; display:block; } .signup-wrapper { border-radius:12px; } }
   </style>
 </head>
 
 <body>
-  <a href="{% url 'home' %}" class="btn btn-outline-primary home-btn">Home</a>
+<a href="{% url 'home' %}" class="btn btn-outline-primary home-btn">Home</a>
 
-  <div class="signup-wrapper row">
-    <div id="signupLeft" class="col-lg-6 col-md-12 signup-left text-center text-lg-start">
-      <h2 class="fw-bold">Join SkillConnect</h2>
-      <p>Connect with top freelancers & clients worldwide.</p>
-      <img src="{% static 'img/illustration-1.webp'%}" alt="Signup Illustration">
-    </div>
+<div class="signup-wrapper row">
+  <div id="signupLeft" class="col-lg-6 col-md-12 signup-left text-center text-lg-start">
+    <h2 class="fw-bold">Join SkillConnect</h2>
+    <p>Connect with top freelancers & clients worldwide.</p>
+    <img src="{% static 'img/illustration-1.webp'%}" alt="Signup Illustration">
+  </div>
 
-    <div class="col-lg-6 col-md-12 signup-right">
-      <h3 class="fw-bold mb-3">Create Account</h3>
-      <p class="text-muted">Start your freelancing journey today</p>
+  <div class="col-lg-6 col-md-12 signup-right">
+    <h3 class="fw-bold mb-3">Create Account</h3>
+    <p class="text-muted">Start your freelancing journey today</p>
 
-      <form id="signupForm">
+    <form id="signupForm">
+      <div class="mb-3">
+        <label class="form-label fw-bold">Sign up as:</label>
+        <select id="accountType" class="form-select" required>
+          <option value="">Select account type</option>
+          <option value="freelancer">Freelancer</option>
+          <option value="recruiter">Recruiter</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="name" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-control" required>
+      </div>
+
+      <!-- Freelancer-specific fields -->
+      <div id="freelancerFields" style="display:none;">
         <div class="mb-3">
-          <label class="form-label fw-bold">Sign up as:</label>
-          <select id="accountType" class="form-select" required>
-            <option value="">Select account type</option>
-            <option value="freelancer">Freelancer</option>
-            <option value="recruiter">Recruiter</option>
-          </select>
+          <label class="form-label">Education</label>
+          <input type="text" id="education" class="form-control">
         </div>
-
         <div class="mb-3">
-          <label class="form-label">Full Name</label>
-          <input type="text" id="name" class="form-control" required>
+          <label class="form-label">Experience (Years)</label>
+          <input type="number" id="experience" class="form-control">
         </div>
-
         <div class="mb-3">
-          <label class="form-label">Email Address</label>
-          <input type="email" id="email" class="form-control" required>
+          <label class="form-label">Tech Stack</label>
+          <input type="text" id="techStack" class="form-control" placeholder="HTML, CSS, JS">
         </div>
-
         <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input type="password" id="password" class="form-control" required>
+          <label class="form-label">Skills</label>
+          <input type="text" id="skills" class="form-control" placeholder="Web Development, Design">
         </div>
+      </div>
 
-        <!-- Freelancer-specific fields -->
-        <div id="freelancerFields" style="display:none;">
-          <div class="mb-3">
-            <label class="form-label">Education</label>
-            <input type="text" id="education" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Experience (Years)</label>
-            <input type="number" id="experience" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Tech Stack</label>
-            <input type="text" id="techStack" class="form-control" placeholder="HTML, CSS, JS">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Skills</label>
-            <input type="text" id="skills" class="form-control" placeholder="Web Development, Design">
-          </div>
-        </div>
+      <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Sign Up</button>
+      <p class="text-center mt-3">
+        Already have an account? <a href="{% url 'login_page' %}" class="fw-bold">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
 
-        <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Sign Up</button>
-        <p class="text-center mt-3">
-          Already have an account? <a href="{% url 'login_page' %}" class="fw-bold">Login</a>
-        </p>
-      </form>
+<!-- Toast container -->
+<div class="toast-container">
+  <div id="signupErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="signupErrorMsg">Error occurred!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
 
-  <!-- Toast container -->
-  <div class="toast-container">
-    <div id="signupErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="signupErrorMsg">Error occurred!</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>
-
-    <div id="signupSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="signupSuccessMsg">OTP sent!</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
+  <div id="signupSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="signupSuccessMsg">OTP sent!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
+</div>
 
-  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
 
 <script>
-  const accountTypeSelect = document.getElementById("accountType");
-  const freelancerFields = document.getElementById("freelancerFields");
-  const signupLeft = document.getElementById("signupLeft");
-  const errorToast = new bootstrap.Toast(document.getElementById("signupErrorToast"));
-  const successToast = new bootstrap.Toast(document.getElementById("signupSuccessToast"));
+const accountTypeSelect = document.getElementById("accountType");
+const freelancerFields = document.getElementById("freelancerFields");
+const signupLeft = document.getElementById("signupLeft");
+const errorToast = new bootstrap.Toast(document.getElementById("signupErrorToast"));
+const successToast = new bootstrap.Toast(document.getElementById("signupSuccessToast"));
 
-  // Show freelancer fields
-  accountTypeSelect.addEventListener("change", function () {
-    const type = this.value;
-    freelancerFields.style.display = type === "freelancer" ? "block" : "none";
-    signupLeft.style.justifyContent = type === "freelancer" ? "center" : "flex-start";
-  });
+// Show freelancer fields
+accountTypeSelect.addEventListener("change", function () {
+  const type = this.value;
+  freelancerFields.style.display = type === "freelancer" ? "block" : "none";
+  signupLeft.style.justifyContent = type === "freelancer" ? "center" : "flex-start";
+});
 
-  // Submit Signup Form
-  document.getElementById("signupForm").onsubmit = async function (e) {
-    e.preventDefault();
+// Submit Signup Form
+document.getElementById("signupForm").onsubmit = async function (e) {
+  e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const accountType = accountTypeSelect.value;
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const accountType = accountTypeSelect.value;
 
-    // Call backend OTP API
-    let response = await fetch("http://127.0.0.1:8000/send-otp/", {
+  // Freelancer fields
+  const education = document.getElementById("education")?.value || "";
+  const experience = document.getElementById("experience")?.value || 0;
+  const techStack = document.getElementById("techStack")?.value || "";
+  const skills = document.getElementById("skills")?.value || "";
+
+  try {
+    let response = await fetch("/send-otp/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         full_name: name,
         email: email,
         password: password,
-        accountType: accountType
+        accountType: accountType,
+        education: education,
+        experience: experience,
+        techStack: techStack,
+        skills: skills
       })
     });
 
@@ -234,15 +165,19 @@
       return;
     }
 
-    // SUCCESS - OTP sent
     document.getElementById("signupSuccessMsg").innerText = "OTP sent! Check your email.";
     successToast.show();
 
-    // Save email to verify OTP later
-    localStorage.setItem("pendingUserEmail", email);
+    // Redirect to OTP verification page after short delay
+    setTimeout(() => {
+      window.location.href = "{% url 'verify_otp_page' %}";
+    }, 1500);
 
-    setTimeout(() => window.location.href = "{% url 'verify_otp_page' %}", 1500);
-  };
+  } catch (err) {
+    document.getElementById("signupErrorMsg").innerText = "Server error!";
+    errorToast.show();
+  }
+};
 </script>
 
 </body>

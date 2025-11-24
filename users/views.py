@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password, check_password
-from .models import User, FreelancerProfile, OTP
+from .models import User, OTP
 from django.utils import timezone
 import json
 from django.contrib.auth import authenticate
@@ -38,32 +38,59 @@ def register_page(request):
 def verify_otp_page(request):
     return render(request,"verify_otp.html")
 
-@csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.core.mail import send_mail
+import json, random
+from .models import User, FreelancerDetail
 
+@csrf_exempt
 def send_otp(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        print(data)
         full_name = data.get("full_name")
         email = data.get("email")
         password = data.get("password")
         accountType = data.get("accountType")
+        education = data.get("education", "")
+        experience = data.get("experience", 0)
+        techStack = data.get("techStack", "")
+        skills = data.get("skills", "")
 
-        if not email or not password:
-            return JsonResponse({"status": "error", "message": "Missing fields"})
+        if not email or not password or not full_name or not accountType:
+            return JsonResponse({"status": "error", "message": "Missing required fields"})
 
+        # Check if user already exists
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({"status": "error", "message": "Email already registered"})
+
+        # Generate OTP
         otp = str(random.randint(100000, 999999))
 
-        temp_storage[email] = {
-            "otp": otp,
-            "password": password,
-            "full_name": full_name,
-            "accountType": accountType,
-        }
+        # Create user with is_verified=False
+        user = User.objects.create(
+            full_name=full_name,
+            email=email,
+            password=password,  # will be hashed in model save()
+            account_type=accountType,
+            otp=otp,
+            is_verified=False
+        )
 
-        # Save email in session (important)
+        # If freelancer, create FreelancerDetail
+        if accountType == "freelancer":
+            FreelancerDetail.objects.create(
+                user=user,
+                education=education,
+                experience=experience,
+                tech_stack=techStack,
+                skills=skills
+            )
+
+        # Save pending email in session
         request.session["pending_email"] = email
 
+        # Send OTP email
         send_mail(
             "Your OTP for SkillConnect",
             f"Your OTP is: {otp}",
@@ -76,47 +103,34 @@ def send_otp(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-
-
-# temp_storage = {"email": {"otp": "123456", "password": "pass"}}
-
-
-
-
 @csrf_exempt
 def verify_otp(request):
     if request.method == "POST":
         data = json.loads(request.body)
         otp = data.get("otp")
-
-        print("Session:", request.session)
-        print("OTP received:", otp)
-
         email = request.session.get("pending_email")
 
         if not email or not otp:
-            return JsonResponse({"status": "error", "message": "Missing email or otp"})
+            return JsonResponse({"status": "error", "message": "Missing email or OTP"})
 
-        details = temp_storage.get(email)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "User not found"})
 
-        if details and details["otp"] == otp:
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=details["password"]
-            )
+        if user.otp == otp:
+            user.is_verified = True
+            user.otp = ""  # clear OTP after verification
+            user.save()
 
-            temp_storage.pop(email)
+            # Clear session
             del request.session["pending_email"]
 
-            return JsonResponse({"status": "success", "message": "OTP verified"})
+            return JsonResponse({"status": "success", "message": "OTP verified, signup complete"})
 
         return JsonResponse({"status": "error", "message": "Invalid OTP"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-
 
 
 @csrf_exempt
@@ -188,31 +202,43 @@ def register_user(request):
 
     return JsonResponse({"status": "success", "msg": "OTP sent", "email": email})
 
-
-
-
 @csrf_exempt
 def login_user(request):
     if request.method == "POST":
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
         email = data.get("email")
         password = data.get("password")
         account_type = data.get("accountType")
 
-        user = authenticate(username=email, password=password)
+        # Check required fields
+        if not email or not password or not account_type:
+            return JsonResponse({"status": "error", "message": "All fields are required"})
 
-        if user:
-            return JsonResponse({
-                "status": "success",
-                "message": "Login successful",
-                "user_id": user.id,
-                "name": user.username,
-                "accountType": account_type
-            })
-        else:
-            return JsonResponse({
-                "status": "error",
-                "message": "Invalid email or password"
-            })
+        try:
+            # Check if user exists with given email and account type
+            user = User.objects.get(email=email, account_type=account_type)
+        except User.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "User does not exist"})
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
+        # Verify password using Django's check_password
+        if not check_password(password, user.password):
+            return JsonResponse({"status": "error", "message": "Incorrect password"})
+
+        # Return success with user info
+        return JsonResponse({
+            "status": "success",
+            "message": "Login successful",
+            "user": {
+                "id": user.id,
+                "full_name": user.full_name,
+                "email": user.email,
+                "account_type": user.account_type
+            }
+        })
+
+    # If not POST request
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)

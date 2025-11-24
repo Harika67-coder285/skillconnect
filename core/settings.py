@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'freelance_skill_connect',        # your phpMyAdmin database
+        'NAME': 'skillconnect_db',        # your phpMyAdmin database
         'USER': 'root',                # your phpMyAdmin username
         'PASSWORD': '',                # your phpMyAdmin password (empty if none)
         'HOST': 'localhost',
