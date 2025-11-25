@@ -1,0 +1,69 @@
+# ==============================
+# Python / Django
+# ==============================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+*.env
+
+# Django migrations (keep __init__.py)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Media files (user uploads)
+media/
+
+# Static files (can be collected in deployment)
+staticfiles/
+static/
+
+# Logs
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+nosetests.xml
+*.cover
+*.py,cover
+
+# pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Django secret keys
+*.key
+
+# ==============================
+# IDEs / Editors
+# ==============================
+.vscode/
+.idea/
+*.iml
+*.iws
+out/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Misc
+# ==============================
+*.swp
+*.bak

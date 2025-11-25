@@ -73,26 +73,28 @@
 </head>
 
 <body>
-  <!-- Home Button -->
+
   <a href="{% url 'home' %}" class="btn btn-outline-primary home-btn">Home</a>
 
   <div class="login-wrapper row">
-    <!-- Illustration -->
+
     <div class="col-lg-6 col-md-12 login-left text-center text-lg-start">
       <h2 class="fw-bold">Welcome Back!</h2>
       <p>Login to continue your SkillConnect journey.</p>
       <img src="{% static 'img/features-illustration-3.webp'%}" alt="Login Illustration">
     </div>
 
-    <!-- Login Form -->
     <div class="col-lg-6 col-md-12 login-right">
       <h3 class="fw-bold mb-3">Login</h3>
       <p class="text-muted">Access your account</p>
 
-      <form id="loginForm">
+      <!-- FIXED FORM -->
+      <form method="POST" action="{% url 'login_user' %}">
+        {% csrf_token %}
+
         <div class="mb-3">
           <label class="form-label fw-bold">Login as:</label>
-          <select id="accountType" class="form-select" required>
+          <select name="accountType" class="form-select" required>
             <option value="">Select account type</option>
             <option value="freelancer">Freelancer</option>
             <option value="recruiter">Recruiter</option>
@@ -101,12 +103,12 @@
 
         <div class="mb-3">
           <label class="form-label">Email Address</label>
-          <input type="email" id="loginEmail" class="form-control" required>
+          <input type="email" name="email" class="form-control" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Password</label>
-          <input type="password" id="loginPassword" class="form-control" required>
+          <input type="password" name="password" class="form-control" required>
         </div>
 
         <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Login</button>
@@ -116,85 +118,15 @@
           <a href="{% url 'register_page' %}" class="fw-bold">Sign Up</a>
         </p>
       </form>
-    </div>
-  </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container">
-    <!-- Success Toast -->
-    <div class="toast align-items-center text-bg-success border-0" id="loginSuccessToast" role="alert"
-      aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">Login Successful! Redirecting...</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-          aria-label="Close"></button>
-      </div>
-    </div>
+      {% if error %}
+      <p class="text-danger mt-2">{{ error }}</p>
+      {% endif %}
 
-    <!-- Error Toast -->
-    <div class="toast align-items-center text-bg-danger border-0" id="loginErrorToast" role="alert" aria-live="assertive"
-      aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="loginErrorMsg">Invalid email or password!</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-          aria-label="Close"></button>
-      </div>
     </div>
   </div>
 
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
-<script>
-document.getElementById("loginForm").onsubmit = async function (e) {
-  e.preventDefault();
-
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-  const accountType = document.getElementById("accountType").value;
-
-  if (!accountType) {
-    document.getElementById("loginErrorMsg").innerText = "Please select account type!";
-    new bootstrap.Toast(document.getElementById("loginErrorToast")).show();
-    return;
-  }
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/login_user/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-        accountType: accountType
-      })
-    });
-
-    const result = await response.json();
-
-    if (result.status === "success") {
-      // Show success toast
-      new bootstrap.Toast(document.getElementById("loginSuccessToast")).show();
-
-      // Save logged-in user info in localStorage
-      localStorage.setItem("loggedInUser", JSON.stringify(result.user));
-
-      // Redirect after 1 second
-      setTimeout(() => {
-        window.location.href = "{% url 'dashboard' %}";
-      }, 1000);
-    } else {
-      // Show error toast with message from backend
-      document.getElementById("loginErrorMsg").innerText = result.message;
-      new bootstrap.Toast(document.getElementById("loginErrorToast")).show();
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-    document.getElementById("loginErrorMsg").innerText = "Server error. Try again later.";
-    new bootstrap.Toast(document.getElementById("loginErrorToast")).show();
-  }
-};
-</script>
-
-
 </body>
 
 </html>

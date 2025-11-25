@@ -1,7 +1,3 @@
-# users/models.py
-
-from django.db import models
-
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
@@ -10,31 +6,39 @@ class User(models.Model):
         ('freelancer', 'Freelancer'),
         ('recruiter', 'Recruiter'),
     )
+
     full_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
     account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
     is_verified = models.BooleanField(default=False)
-    otp = models.CharField(max_length=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        if not self.password.startswith('pbkdf2_'):
-            self.password = make_password(self.password)
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"{self.full_name} <{self.email}>"
 
-class FreelancerDetail(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='freelancer_detail')
+# models.py
+from django.db import models
+
+class Freelancer(models.Model):
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
     education = models.CharField(max_length=255, blank=True, null=True)
-    experience = models.IntegerField(blank=True, null=True)
+    experience = models.IntegerField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=False)
 
+class Recruiter(models.Model):
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=False)
 
 class OTP(models.Model):
     email = models.EmailField()
-    otp = models.CharField(max_length=6)
+    code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
-        return f"OTP({self.email} - {self.otp})"
+

@@ -1,244 +1,200 @@
-# users/views.py
-
 import random
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from django.core.mail import send_mail
-from django.contrib.auth.hashers import make_password, check_password
-from .models import User, OTP
 from django.utils import timezone
-import json
-from django.contrib.auth import authenticate
+from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, check_password
+from datetime import timedelta
+from .models import Freelancer, Recruiter, OTP
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.shortcuts import render
+import json
+# ---------- Pages ----------
+def home(request): return render(request, "index.html")
+def browse_page(request): return render(request, "browse.html")
+def how_it_works_page(request): return render(request, "howitworks.html")
+from django.shortcuts import render, redirect
+from .models import Freelancer, Recruiter
 
+def dashboard(request):
+    user_id = request.session.get("user_id")
+    account_type = request.session.get("account_type")
 
+    if not user_id or not account_type:
+        return redirect("login_page")
 
-temp_storage = {}  
+    # fetch user
+    if account_type == "freelancer":
+        user = Freelancer.objects.get(id=user_id)
+    else:
+        user = Recruiter.objects.get(id=user_id)
 
+    return render(request, "dashboard.html", {"user": user})
 
-
-def home(request):
-    return render(request, "index.html")  # Make sure index.html is in templates folder
-def browse_page(request):
-    return render(request, "browse.html")
-
-def how_it_works_page(request):
-    return render(request, "howitworks.html")
-
-def dashboard_page(request):
-    return render(request, "dashboard.html")
-def login_page(request):
-    return render(request, "login.html")
-
-def register_page(request):
-    return render(request, "signup.html")
+def login_page(request): return render(request, "login.html")
+def register_page(request): return render(request, "signup.html")
 
 def verify_otp_page(request):
-    return render(request,"verify_otp.html")
+    email = request.GET.get("email")
+    if not email:
+        return redirect('register_page')
+    return render(request, "verify_otp.html", {"email": email})
 
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.core.mail import send_mail
-import json, random
-from .models import User, FreelancerDetail
-
-@csrf_exempt
-def send_otp(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        full_name = data.get("full_name")
-        email = data.get("email")
-        password = data.get("password")
-        accountType = data.get("accountType")
-        education = data.get("education", "")
-        experience = data.get("experience", 0)
-        techStack = data.get("techStack", "")
-        skills = data.get("skills", "")
-
-        if not email or not password or not full_name or not accountType:
-            return JsonResponse({"status": "error", "message": "Missing required fields"})
-
-        # Check if user already exists
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({"status": "error", "message": "Email already registered"})
-
-        # Generate OTP
-        otp = str(random.randint(100000, 999999))
-
-        # Create user with is_verified=False
-        user = User.objects.create(
-            full_name=full_name,
-            email=email,
-            password=password,  # will be hashed in model save()
-            account_type=accountType,
-            otp=otp,
-            is_verified=False
-        )
-
-        # If freelancer, create FreelancerDetail
-        if accountType == "freelancer":
-            FreelancerDetail.objects.create(
-                user=user,
-                education=education,
-                experience=experience,
-                tech_stack=techStack,
-                skills=skills
-            )
-
-        # Save pending email in session
-        request.session["pending_email"] = email
-
-        # Send OTP email
-        send_mail(
-            "Your OTP for SkillConnect",
-            f"Your OTP is: {otp}",
-            "projectsinfo697@gmail.com",
-            [email],
-        )
-
-        return JsonResponse({"status": "success", "message": "OTP sent"})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+# ---------- Register User ----------
 
 
+import bcrypt
+
+
+
+# ---------- Verify OTP ----------
 @csrf_exempt
 def verify_otp(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        otp = data.get("otp")
-        email = request.session.get("pending_email")
+        email = request.POST.get("email")
+        entered_otp = request.POST.get("otp")
 
-        if not email or not otp:
-            return JsonResponse({"status": "error", "message": "Missing email or OTP"})
+        if not email or not entered_otp:
+            return JsonResponse({"status": "error", "message": "Email and OTP are required."})
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "User not found"})
+        otp_record = OTP.objects.filter(email=email).order_by('-created_at').first()
+        if not otp_record:
+            return JsonResponse({"status": "error", "message": "No OTP found for this email."})
 
-        if user.otp == otp:
-            user.is_verified = True
-            user.otp = ""  # clear OTP after verification
+        if timezone.now() > otp_record.created_at + timedelta(minutes=10):
+            otp_record.delete()
+            return JsonResponse({"status": "error", "message": "OTP expired. Please signup again."})
+
+        if str(otp_record.code) != str(entered_otp):
+            return JsonResponse({"status": "error", "message": "Incorrect OTP."})
+
+        # Activate user
+        if Freelancer.objects.filter(email=email).exists():
+            user = Freelancer.objects.get(email=email)
+            user.is_active = True
+            user.save()
+        elif Recruiter.objects.filter(email=email).exists():
+            user = Recruiter.objects.get(email=email)
+            user.is_active = True
             user.save()
 
-            # Clear session
-            del request.session["pending_email"]
+        otp_record.delete()
+        return JsonResponse({"status": "success", "message": "OTP verified. Redirecting to login..."})
 
-            return JsonResponse({"status": "success", "message": "OTP verified, signup complete"})
-
-        return JsonResponse({"status": "error", "message": "Invalid OTP"})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    return JsonResponse({"status": "error", "message": "Invalid request."})
 
 
+
+from django.core.mail import send_mail
+import random
+
+# ---------- Register User ----------
 @csrf_exempt
 def register_user(request):
-    """
-    POST expected fields:
-    full_name, email, password, account_type
-    optional freelancer fields: education, experience, tech_stack, skills
-    """
-    if request.method != "POST":
-        return JsonResponse({"status": "error", "msg": "Only POST allowed"}, status=405)
-
-    data = request.POST or request.body
-    # If you send JSON from frontend, parse JSON:
-    if request.content_type == "application/json":
-        import json
-        body = json.loads(request.body.decode())
-        full_name = body.get("full_name")
-        email = body.get("email")
-        password = body.get("password")
-        account_type = body.get("account_type")
-        education = body.get("education", "")
-        experience = body.get("experience", None)
-        tech_stack = body.get("tech_stack", "")
-        skills = body.get("skills", "")
-    else:
+    if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        account_type = request.POST.get("account_type")
         full_name = request.POST.get("full_name")
         email = request.POST.get("email")
         password = request.POST.get("password")
-        account_type = request.POST.get("account_type")
-        education = request.POST.get("education", "")
-        experience = request.POST.get("experience", None)
-        tech_stack = request.POST.get("tech_stack", "")
-        skills = request.POST.get("skills", "")
+        education = request.POST.get("education")
+        experience = request.POST.get("experience")
+        tech_stack = request.POST.get("tech_stack")
+        skills = request.POST.get("skills")
 
-    if not (full_name and email and password and account_type):
-        return JsonResponse({"status": "error", "msg": "Missing required fields"}, status=400)
+        if not all([account_type, full_name, email, password]):
+            return JsonResponse({"status": "error", "message": "Please fill all required fields."})
 
-    if User.objects.filter(email=email).exists():
-        return JsonResponse({"status": "error", "msg": "Email already exists"}, status=400)
+        # Check if user exists
+        if Freelancer.objects.filter(email=email).exists() or Recruiter.objects.filter(email=email).exists():
+            return JsonResponse({"status": "error", "message": "User with this email already exists."})
 
-    # hash password
-    hashed = make_password(password)
+        try:
+            hashed_password = make_password(password)
 
-    user = User.objects.create(
-        full_name=full_name,
-        email=email,
-        password=hashed,
-        account_type=account_type,
-        is_verified=False
-    )
+            if account_type == "freelancer":
+                user = Freelancer.objects.create(
+                    full_name=full_name,
+                    email=email,
+                    password=hashed_password,
+                    education=education,
+                    experience=int(experience) if experience else 0,
+                    tech_stack=tech_stack,
+                    skills=skills,
+                    is_active=False
+                )
+            elif account_type == "recruiter":
+                user = Recruiter.objects.create(
+                    full_name=full_name,
+                    email=email,
+                    password=hashed_password,
+                    is_active=False
+                )
+            else:
+                return JsonResponse({"status": "error", "message": "Invalid account type."})
 
-    # If freelancer, save profile
-    if account_type == "freelancer":
-        FreelancerProfile.objects.create(
-            user=user,
-            education=education,
-            experience=experience if experience != "" else None,
-            tech_stack=tech_stack,
-            skills=skills
-        )
+            # Generate OTP
+            otp_code = str(random.randint(100000, 999999))
+            OTP.objects.create(email=email, code=otp_code)
 
-    # send OTP
-    try:
-        send_otp_email(email)
-    except Exception as e:
-        # If email sending fails, keep user but notify frontend
-        return JsonResponse({"status": "error", "msg": f"Failed to send OTP: {str(e)}"}, status=500)
+            # Send OTP via email
+            send_mail(
+                subject="SkillConnect OTP Verification",
+                message=f"Hello {full_name},\nYour OTP for SkillConnect signup is: {otp_code}",
+                from_email="noreply@skillconnect.com",  # Replace with your email if needed
+                recipient_list=[email],
+                fail_silently=False,
+            )
 
-    return JsonResponse({"status": "success", "msg": "OTP sent", "email": email})
+            return JsonResponse({"status": "success"})
 
-@csrf_exempt
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)})
+
+    return JsonResponse({"status": "error", "message": "Invalid request."})
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
+from .models import Freelancer, Recruiter
+
 def login_user(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    if request.method == "GET":
+        return render(request, "login.html")  # ensures CSRF cookie
 
-        email = data.get("email")
-        password = data.get("password")
-        account_type = data.get("accountType")
+    # POST
+    account_type = request.POST.get("accountType")
+    email = request.POST.get("email")
+    password = request.POST.get("password")
 
-        # Check required fields
-        if not email or not password or not account_type:
-            return JsonResponse({"status": "error", "message": "All fields are required"})
+    if not all([account_type, email, password]):
+        return render(request, "login.html", {"error": "Fill all fields."})
 
-        try:
-            # Check if user exists with given email and account type
-            user = User.objects.get(email=email, account_type=account_type)
-        except User.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "User does not exist"})
+    try:
+        if account_type == "freelancer":
+            user = Freelancer.objects.get(email=email)
+        elif account_type == "recruiter":
+            user = Recruiter.objects.get(email=email)
+        else:
+            return render(request, "login.html", {"error": "Invalid account type."})
 
-        # Verify password using Django's check_password
-        if not check_password(password, user.password):
-            return JsonResponse({"status": "error", "message": "Incorrect password"})
+        if not user.is_active:
+            return render(request, "login.html", {"error": "Account not verified. Check email."})
 
-        # Return success with user info
-        return JsonResponse({
-            "status": "success",
-            "message": "Login successful",
-            "user": {
-                "id": user.id,
-                "full_name": user.full_name,
-                "email": user.email,
-                "account_type": user.account_type
-            }
-        })
+        if check_password(password, user.password):
+            # set session so dashboard can check
+            request.session['user_id'] = user.id
+            request.session['user_name'] = user.full_name
+            request.session['account_type'] = account_type
+            return redirect('dashboard')
 
-    # If not POST request
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+        else:
+            return render(request, "login.html", {"error": "Invalid email or password."})
+
+    except (Freelancer.DoesNotExist, Recruiter.DoesNotExist):
+        return render(request, "login.html", {"error": "Invalid email or password."})
+from django.shortcuts import redirect
+
+def logout_user(request):
+    request.session.flush()   # clears all session data
+    return redirect('login_page')

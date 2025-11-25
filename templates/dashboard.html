@@ -142,22 +142,23 @@
           <li><a href="{% url 'home' %}" class="active">Home</a></li>
 
           <!-- Categories Dropdown -->
-          <li class="dropdown">
-      <a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-      <ul>
-        <li><a href="{% url 'browse' %}?cat=webdev">Web Development</a></li>
-        <li><a href="{% url 'browse' %}?cat=mobile">Mobile Apps</a></li>
-        <li><a href="{% url 'browse' %}?cat=datascience">Data Science</a></li>
-        <li><a href="{% url 'browse' %}?cat=design">Graphic & UI/UX Design</a></li>
-        <li><a href="{% url 'browse' %}?cat=writing">Content Writing</a></li>
-        <li><a href="{% url 'browse' %}?cat=marketing">Digital Marketing</a></li>
-        <li><a href="{% url 'browse' %}?cat=video">Video Editing</a></li>
-        <li><a href="{% url 'browse' %}?cat=ai">AI & Machine Learning</a></li>
-        <li><a href="{% url 'browse' %}?cat=business">Business & Finance</a></li>
-      </ul>
-    </li>
+<li id="categories-link" class="dropdown" style="display:none;">
+  <a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+  <ul>
+    <li><a href="{% url 'browse' %}?cat=webdev">Web Development</a></li>
+    <li><a href="{% url 'browse' %}?cat=mobile">Mobile Apps</a></li>
+    <li><a href="{% url 'browse' %}?cat=datascience">Data Science</a></li>
+    <li><a href="{% url 'browse' %}?cat=design">Graphic & UI/UX Design</a></li>
+    <li><a href="{% url 'browse' %}?cat=writing">Content Writing</a></li>
+    <li><a href="{% url 'browse' %}?cat=marketing">Digital Marketing</a></li>
+    <li><a href="{% url 'browse' %}?cat=video">Video Editing</a></li>
+    <li><a href="{% url 'browse' %}?cat=ai">AI & Machine Learning</a></li>
+    <li><a href="{% url 'browse' %}?cat=business">Business & Finance</a></li>
+  </ul>
+</li>
 
-          <li><a href="{% url 'browse' %}">Find Freelancers</a></li>
+
+          <li><a href="{% url 'browse' %}" id="browse-link">Find Freelancers</a></li>
           <li><a href="{% url 'how_it_works' %}">How It Works</a></li>
 
           <!-- Login / Sign Up -->
@@ -250,40 +251,45 @@
 <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 
-  <script>
-    // Check if user is logged in
-    let isLoggedIn = localStorage.getItem("isLoggedIn");
-    let user = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
-    if (!isLoggedIn || !user.name) {
-      // Not logged in: optionally redirect to login
-      window.location.href = "{% url 'login_page' %}";
-    } else {
-      document.addEventListener("DOMContentLoaded", () => {
-        // Show profile avatar and username
-        const profileLink = document.getElementById("profile-link");
-        const profileAvatar = document.getElementById("profile-avatar");
-        const loginLink = document.getElementById("login-link");
-        const signupLink = document.getElementById("signup-link");
-        const headerLogout = document.getElementById("header-logout");
-        const username = document.getElementById("username");
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const userId = "{{ request.session.user_id|default:'' }}";
+    const accountType = "{{ request.session.account_type|default:''|escapejs }}";
 
+    const profileLink = document.getElementById("profile-link");
+    const loginLink = document.getElementById("login-link");
+    const signupLink = document.getElementById("signup-link");
+    const headerLogout = document.getElementById("header-logout");
+    const browseLink = document.getElementById("browse-link");
+    const categoriesLink = document.getElementById("categories-link"); // 👈 new
+
+    if (userId) {
         if (profileLink) profileLink.style.display = "flex";
-        if (profileAvatar && user.avatar) profileAvatar.src = user.avatar;
         if (headerLogout) headerLogout.style.display = "block";
         if (loginLink) loginLink.style.display = "none";
         if (signupLink) signupLink.style.display = "none";
-        if (username) username.innerText = user.name;
-      });
+        if (browseLink) {
+            browseLink.style.display = "block";
+            browseLink.innerText = (accountType === "freelancer") ? "Find a Client" : "Find Freelancers";
+        }
+        if (categoriesLink) categoriesLink.style.display = "block"; // 👈 show categories for logged-in users
+    } else {
+        if (profileLink) profileLink.style.display = "none";
+        if (headerLogout) headerLogout.style.display = "none";
+        if (loginLink) loginLink.style.display = "block";
+        if (signupLink) signupLink.style.display = "block";
+        if (browseLink) browseLink.style.display = "none";
+        if (categoriesLink) categoriesLink.style.display = "none"; // 👈 hide categories for guests
     }
+});
 
-    // Logout function
-    function logoutHeader() {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("loggedInUser");
-      window.location.href = "{% url 'login_page' %}";
-    }
-  </script>
+function logoutHeader() {
+    window.location.href = "{% url 'logout_user' %}";
+}
+</script>
+
 
 </body>
 </html>
