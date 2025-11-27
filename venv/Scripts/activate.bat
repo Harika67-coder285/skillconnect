@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\harik\OneDrive\Desktop\infosys proj\skillconnect_backend\venv
+set VIRTUAL_ENV=C:\Users\harik\OneDrive\Desktop\infosys-skillconnect\skillconnect_backend\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

@@ -43,7 +43,6 @@ def verify_otp_page(request):
 # ---------- Register User ----------
 
 
-import bcrypt
 
 
 
