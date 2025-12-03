@@ -1,4 +1,4 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,11 +8,11 @@
   <title>Sign Up - SkillConnect</title>
 
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-
-<link href="{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
   <style>
+    /* CSS unchanged from your original file */
     body {
       background: #f2f6ff;
       overflow-x: hidden;
@@ -37,7 +37,6 @@
       align-items: center;
       justify-content: flex-start;
       text-align: center;
-      transition: justify-content 0.3s;
     }
 
     .signup-left img {
@@ -67,13 +66,16 @@
       z-index: 999;
     }
 
-    /* Toast container top center */
     .toast-container {
       position: fixed;
       top: 70px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1055;
+    }
+
+    span.required {
+      color: red;
     }
 
     @media (max-width: 992px) {
@@ -117,72 +119,53 @@
 
     <div class="col-lg-6 col-md-12 signup-right">
       <h3 class="fw-bold mb-3">Create Account</h3>
-      <p class="text-muted">Start your freelancing journey today</p>
+      <p class="text-muted">Start your journey today</p>
 
-<form id="signupForm">
-  <div class="mb-3">
-    <label class="form-label fw-bold">Sign up as:</label>
-    <select name="account_type" id="accountType" class="form-select" required>
-      <option value="">Select account type</option>
-      <option value="freelancer">Freelancer</option>
-      <option value="recruiter">Recruiter</option>
-    </select>
-  </div>
+      <form id="signupForm" enctype="multipart/form-data">
 
-  <div class="mb-3">
-    <label class="form-label">Full Name</label>
-    <input type="text" name="full_name" id="name" class="form-control" required>
-  </div>
+        <!-- Account Type -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Sign up as: <span class="required">*</span></label>
+          <select name="account_type" id="accountType" class="form-select" required>
+            <option value="">Select account type</option>
+            <option value="freelancer">Freelancer</option>
+            <option value="recruiter">Recruiter</option>
+          </select>
+        </div>
 
-  <div class="mb-3">
-    <label class="form-label">Email Address</label>
-    <input type="email" name="email" id="email" class="form-control" required>
-  </div>
+        <!-- Basic Info -->
+        <div class="mb-3">
+          <label class="form-label">Full Name <span class="required">*</span></label>
+          <input type="text" name="full_name" id="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email Address <span class="required">*</span></label>
+          <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password <span class="required">*</span></label>
+          <input type="password" name="password" id="password" class="form-control" required>
+        </div>
 
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input type="password" name="password" id="password" class="form-control" required>
-  </div>
-
-  <!-- Freelancer-specific fields -->
-  <div id="freelancerFields" style="display:none;">
-    <div class="mb-3">
-      <label class="form-label">Education</label>
-      <input type="text" name="education" id="education" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Experience (Years)</label>
-      <input type="number" name="experience" id="experience" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Tech Stack</label>
-      <input type="text" name="tech_stack" id="techStack" class="form-control" placeholder="HTML, CSS, JS">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Skills</label>
-      <input type="text" name="skills" id="skills" class="form-control" placeholder="Web Development, Design">
+        <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Sign Up</button>
+        <p class="text-center mt-3">
+          Already have an account? <a href="{% url 'login_page' %}" class="fw-bold">Login</a>
+        </p>
+      </form>
     </div>
   </div>
 
-  <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Sign Up</button>
-  <p class="text-center mt-3">
-    Already have an account? <a href="{% url 'login_page' %}" class="fw-bold">Login</a>
-  </p>
-</form>
-
-    </div>
-  </div>
-
-  <!-- Toast container -->
+  <!-- Toasts -->
   <div class="toast-container">
-    <div id="signupErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="signupErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body" id="signupErrorMsg">Error occurred!</div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>
     </div>
-
-    <div id="signupSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="signupSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body" id="signupSuccessMsg">OTP sent!</div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -190,58 +173,47 @@
     </div>
   </div>
 
-  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    const accountTypeSelect = document.getElementById("accountType");
+    const signupLeft = document.getElementById("signupLeft");
 
-<script>
-const accountTypeSelect = document.getElementById("accountType");
-const freelancerFields = document.getElementById("freelancerFields");
-const signupLeft = document.getElementById("signupLeft");
-const errorToast = new bootstrap.Toast(document.getElementById("signupErrorToast"));
-const successToast = new bootstrap.Toast(document.getElementById("signupSuccessToast"));
+    const errorToast = new bootstrap.Toast(document.getElementById("signupErrorToast"));
+    const successToast = new bootstrap.Toast(document.getElementById("signupSuccessToast"));
 
-// Show/hide freelancer fields
-accountTypeSelect.addEventListener("change", function () {
-    const type = this.value;
-    freelancerFields.style.display = type === "freelancer" ? "block" : "none";
-    signupLeft.style.justifyContent = type === "freelancer" ? "center" : "flex-start";
-});
-
-// Submit Signup Form
-document.getElementById("signupForm").onsubmit = async function (e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-
-    // Send data to Django backend (register_user view)
-    const response = await fetch("{% url 'register_user' %}", {
-        method: "POST",
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+    // Just adjust left section based on account type (no extra fields now)
+    accountTypeSelect.addEventListener("change", function () {
+      const isFreelancer = this.value === "freelancer";
+      signupLeft.style.justifyContent = isFreelancer ? "center" : "flex-start";
     });
 
-    const result = await response.json();
+    // Form submit
+    document.getElementById("signupForm").onsubmit = async function(e) {
+      if (!this.checkValidity()) return; // browser validation
+      e.preventDefault();
 
-    if (result.status !== "success") {
-        // Show error toast
+      const formData = new FormData(this);
+      const response = await fetch("{% url 'register_user' %}", {
+        method: "POST",
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      const result = await response.json();
+      if (result.status !== "success") {
         document.getElementById("signupErrorMsg").innerText = result.message || "Signup failed!";
         errorToast.show();
         return;
-    }
+      }
 
-    // SUCCESS - OTP sent
-    document.getElementById("signupSuccessMsg").innerText = "OTP sent! Check your email.";
-    successToast.show();
+      document.getElementById("signupSuccessMsg").innerText = "OTP sent! Check your email.";
+      successToast.show();
 
-    // Redirect to verify_otp page with email as query param
-    const email = formData.get("email");
-    setTimeout(() => {
+      const email = formData.get("email");
+      setTimeout(() => {
         window.location.href = "{% url 'verify_otp_page' %}?email=" + encodeURIComponent(email);
-    }, 1500);
-};
-</script>
-
-
+      }, 500);
+    };
+  </script>
 </body>
 </html>

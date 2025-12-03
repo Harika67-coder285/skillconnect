@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Dashboard - SkillConnect</title>
+
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f5f7ff;
+      padding-top: 97px;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: #fff;
+      padding: 25px;
+      border-right: 1px solid #d8d8d8;
+      position: sticky;
+      top: 80px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      color: #333;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover,
+    .sidebar .active {
+      background: #4154f1;
+      color: #fff !important;
+    }
+
+    .profile-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .edit-photo {
+      display: inline-block;
+      margin-bottom: 20px;
+      cursor: pointer;
+      color: #4154f1;
+    }
+
+    .profile-info p {
+      text-align: left;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="{% static 'img/logo.png'%}" alt="SkillConnect Logo" />
+        <h1 class="sitename">SkillConnect</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'home' %}" class="active">Home</a></li>
+          <li><a href="{% url 'browse' %}" id="browse-link">Find Freelancers</a></li>
+          <li><a href="{% url 'how_it_works' %}">How It Works</a></li>
+
+          <li id="login-link"><a href="{% url 'login_page' %}" class="btn-getstarted">Login</a></li>
+          <li id="signup-link"><a href="{% url 'register_page' %}" class="btn-getstarted">Sign Up</a></li>
+
+          <!-- Profile Avatar -->
+          <li id="profile-link" style="display:none;">
+            <a href="{% url 'dashboard' %}" class="profile-avatar">
+              {% if app_user and app_user.photo %}
+              <img src="{{ app_user.photo.url }}">
+              {% else %}
+              <img src="{% static 'img/image.png' %}">
+              {% endif %}
+            </a>
+          </li>
+
+          <!-- Header Logout -->
+          <li id="header-logout" style="display:none;">
+            <a href="#" onclick="logoutHeader()">Logout</a>
+          </li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div class="container-fluid mt-4">
+    <div class="row">
+
+      <!-- SIDEBAR -->
+      <div class="col-md-3 sidebar">
+        <a href="{% url 'dashboard' %}" class="{% if show == 'profile' or not show %}active{% endif %}"><i class="bi bi-person me-2"></i> Profile</a>
+        <a href="{% url 'my_projects' %}" class="{% if show == 'projects' %}active{% endif %}"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
+        <a href="{% url 'client_requests' %}" class="{% if show == 'requests' %}active{% endif %}"><i class="bi bi-people me-2"></i> Client Requests</a>
+        <a href="" class="{% if show == 'messages' %}active{% endif %}"><i class="bi bi-chat-dots me-2"></i> Messages</a>
+        
+        <a href="#" onclick="logoutHeader()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+      </div>
+
+      <!-- RIGHT CONTENT AREA -->
+      <div class="col-md-9">
+        {% if show == 'projects' %}
+          <div class="profile-card">
+            <h4>My Projects</h4>
+            {% if projects %}
+              <ul class="list-group">
+                {% for project in projects %}
+                  <li class="list-group-item">{{ project.title }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No projects found.</p>
+            {% endif %}
+          </div>
+
+        
+
+    </div>
+  </div>
+
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const userId = "{{ request.session.user_id|default:'' }}";
+    const accountType = "{{ request.session.account_type|default:''|escapejs }}";
+
+    const profileLink = document.getElementById("profile-link");
+    const loginLink = document.getElementById("login-link");
+    const signupLink = document.getElementById("signup-link");
+    const headerLogout = document.getElementById("header-logout");
+    const browseLink = document.getElementById("browse-link");
+    const categoriesLink=document.getElementById("categories-link");
+    if (userId) {
+        if (profileLink) profileLink.style.display = "flex";
+        if (headerLogout) headerLogout.style.display = "block";
+        if (loginLink) loginLink.style.display = "none";
+        if (signupLink) signupLink.style.display = "none";
+        if (browseLink) {
+            browseLink.style.display = "block";
+            browseLink.innerText = (accountType === "freelancer") ? "Find a Client" : "Find Freelancers";
+        }
+        if (categoriesLink) categoriesLink.style.display = "block";
+    } else {
+        if (profileLink) profileLink.style.display = "none";
+        if (headerLogout) headerLogout.style.display = "none";
+        if (loginLink) loginLink.style.display = "block";
+        if (signupLink) signupLink.style.display = "block";
+        if (browseLink) browseLink.style.display = "none";
+        if (categoriesLink) categoriesLink.style.display = "none";
+    }
+});
+
+function logoutHeader() {
+    window.location.href = "{% url 'logout_user' %}";
+}
+</script>
+
+</body>
+</html>

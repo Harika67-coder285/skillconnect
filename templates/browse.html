@@ -173,12 +173,16 @@
 
     <!-- Static Links -->
     <li><a href="{% url 'browse' %}" id="browse-link">Find Freelancers</a></li>
-    <li><a href="{% url 'how_it_works' %}">How It Works</a></li>
+    <li><a href="{% url 'how_it_works' %}">Find Work</a></li>
 
 <li id="profile-link" style="display:none;">
     <a href="{% url 'dashboard' %}" class="profile-avatar">
-        <img src="{% static 'img/avatar-1.webp' %}" alt="Profile" />
-  
+        {% if app_user and app_user.photo %}
+    <img src="{{ app_user.photo.url }}">
+{% else %}
+    <img src="{% static 'img/image.png' %}">
+{% endif %}
+
     </a>
 </li>
 
@@ -281,11 +285,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (headerLogout) headerLogout.style.display = "block";
         if (loginLink) loginLink.style.display = "none";
         if (signupLink) signupLink.style.display = "none";
-        if (browseLink) {
+        if (browseLink && accountType!== "freelancer") {
             browseLink.style.display = "block";
-            browseLink.innerText = (accountType === "freelancer") ? "Find a Client" : "Find Freelancers";
+            browseLink.innerText = "Find Freelancers";
         }
-        if (categoriesLink) categoriesLink.style.display = "block"; // 👈 show categories for logged-in users
+        if (browseLink && accountType=== "freelancer") {
+            browseLink.style.display = "none";
+        }
+        if (categoriesLink && accountType!== "freelancer") categoriesLink.style.display = "block"; // 👈 show categories for logged-in users
+        if (categoriesLink && accountType=== "freelancer") categoriesLink.style.display = "none"; // 👈 show categories for logged-in users
+
     } else {
         if (profileLink) profileLink.style.display = "none";
         if (headerLogout) headerLogout.style.display = "none";

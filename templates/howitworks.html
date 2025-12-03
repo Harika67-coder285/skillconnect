@@ -2,7 +2,6 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -35,14 +34,33 @@
     Template Name: SkillConnect (based on iLanding)
     Updated: Nov 12 2024 with Bootstrap v5.3.3
   -->
+     <style>
+        body {
+            background: #f7f7f7;
+        }
+        .job-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn-apply {
+            background: #007bff;
+            color: white;
+            border-radius: 20px;
+            padding: 6px 18px;
+        }
+        .btn-apply:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 
-<body class="index-page">
+<body>
 
-  <!-- =========================
-       HEADER / NAV
-       ========================= -->
-  <header id="header" class="header d-flex align-items-center fixed-top">
+  <!-- SIDEBAR -->
+     <header id="header" class="header d-flex align-items-center fixed-top">
   <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
     <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
@@ -109,207 +127,43 @@
 </header>
 
 
+    <div class="container mt-4">
 
-  <main class="main">
-    <!-- HERO, ABOUT, FEATURES... (kept intact) -->
-    <!-- Hero Section -->
-    <section id="hero" class="hero section">
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="row align-items-center">
-          <div class="col-lg-6">
-            <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
-              <div class="company-badge mb-4">
-                <i class="bi bi-gear-fill me-2"></i>
-                Working for your success
-              </div>
+        <h2 class="mb-4 text-center">Find Work</h2>
 
-              <h1 class="mb-4">
-                Maecenas Vitae <br />
-                Consectetur Led <br />
-                <span class="accent-text">Vestibulum Ante</span>
-              </h1>
-
-              <p class="mb-4 mb-md-5">
-                Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna.
-              </p>
-
-              <div class="hero-buttons">
-                <a href="#about" class="btn btn-primary me-0 me-sm-2 mx-1">Get Started on SkillConnect</a>
-                <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="btn btn-link mt-2 mt-sm-0 glightbox">
-                  <i class="bi bi-play-circle me-1"></i>
-                  Play Video
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="hero-image" data-aos="zoom-out" data-aos-delay="300">
-              <img src="{% static 'img/illustration-1.webp'%}" alt="Hero Image" class="img-fluid" />
-
-              <div class="customers-badge">
-                <div class="customer-avatars">
-                  <img src="{% static 'img/avatar-1.webp'%}" alt="Customer 1" class="avatar" />
-                  <img src="{% static 'img/avatar-2.webp'%}" alt="Customer 2" class="avatar" />
-                  <img src="{% static 'img/avatar-3.webp'%}" alt="Customer 3" class="avatar" />
-                  <img src="{% static 'img/avatar-4.webp'%}" alt="Customer 4" class="avatar" />
-                  <img src="{% static 'img/avatar-5.webp'%}" alt="Customer 5" class="avatar" />
-                  <span class="avatar more">12+</span>
-                </div>
-                <p class="mb-0 mt-2">12,000+ lorem ipsum dolor sit amet consectetur adipiscing elit</p>
-              </div>
-            </div>
-          </div>
+    
+        
+        <div class="job-card">
+            <h4>Frontend Web Developer</h4>
+            <p>Looking for a React/JS developer for building a dashboard UI.</p>
+            <p><strong>Budget:</strong> ₹15,000</p>
+            <button class="btn btn-apply">Apply Now</button>
         </div>
 
-        <div class="row stats-row gy-4 mt-5" data-aos="fade-up" data-aos-delay="500">
-          <div class="col-lg-3 col-md-6">
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="bi bi-trophy"></i>
-              </div>
-              <div class="stat-content">
-                <h4>3x Won Awards</h4>
-                <p class="mb-0">Vestibulum ante ipsum</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="bi bi-briefcase"></i>
-              </div>
-              <div class="stat-content">
-                <h4>6.5k Faucibus</h4>
-                <p class="mb-0">Nullam quis ante</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="bi bi-graph-up"></i>
-              </div>
-              <div class="stat-content">
-                <h4>80k Mauris</h4>
-                <p class="mb-0">Etiam sit amet orci</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <div class="stat-item">
-              <div class="stat-icon">
-                <i class="bi bi-award"></i>
-              </div>
-              <div class="stat-content">
-                <h4>6x Phasellus</h4>
-                <p class="mb-0">Vestibulum ante ipsum</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- /Hero -->
-
-    <!-- (rest of your sections — About, Features, Clients, Testimonials, Stats, Services, Pricing, FAQ, Contact)
-         are kept exactly as in your original template but cleaned and well-formed -->
-    <!-- For brevity I've kept the rest of the content identical to your working template,
-         but if you want, I can paste the full long file with every section expanded. -->
-    <!-- If you'd like the full expanded file now I can paste it (you chose A) — this is the header+first main section so you can test quickly. -->
-  </main>
-
-  <footer id="footer" class="footer">
-    <div class="container footer-top">
-      <div class="row gy-4">
-        <div class="col-lg-4 col-md-6 footer-about">
-          <a href="{% url 'home' %}" class="logo d-flex align-items-center">
-            <span class="sitename">SkillConnect</span>
-          </a>
-          <div class="footer-contact pt-3">
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
-            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-            <p><strong>Email:</strong> <span>info@example.com</span></p>
-          </div>
-          <div class="social-links d-flex mt-4">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-facebook"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
-            <a href=""><i class="bi bi-linkedin"></i></a>
-          </div>
+        <div class="job-card">
+            <h4>Python Automation Script</h4>
+            <p>Need a Python expert to write automation scripts for daily tasks.</p>
+            <p><strong>Budget:</strong> ₹10,000</p>
+            <button class="btn btn-apply">Apply Now</button>
         </div>
 
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Useful Links</h4>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Terms of service</a></li>
-            <li><a href="#">Privacy policy</a></li>
-          </ul>
+        <div class="job-card">
+            <h4>Django Backend Developer</h4>
+            <p>Create APIs and authentication for a small SaaS project.</p>
+            <p><strong>Budget:</strong> ₹20,000</p>
+            <button class="btn btn-apply">Apply Now</button>
         </div>
 
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Our Services</h4>
-          <ul>
-            <li><a href="#">Web Design</a></li>
-            <li><a href="#">Web Development</a></li>
-            <li><a href="#">Product Management</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Graphic Design</a></li>
-          </ul>
+        <div class="job-card">
+            <h4>Mobile App UI Design</h4>
+            <p>Figma designer needed for designing screens.</p>
+            <p><strong>Budget:</strong> ₹5,000</p>
+            <button class="btn btn-apply">Apply Now</button>
         </div>
 
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Hic solutasetp</h4>
-          <ul>
-            <li><a href="#">Molestiae accusamus iure</a></li>
-            <li><a href="#">Excepturi dignissimos</a></li>
-            <li><a href="#">Suscipit distinctio</a></li>
-            <li><a href="#">Dilecta</a></li>
-            <li><a href="#">Sit quas consectetur</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Nobis illum</h4>
-          <ul>
-            <li><a href="#">Ipsam</a></li>
-            <li><a href="#">Laudantium dolorum</a></li>
-            <li><a href="#">Dinera</a></li>
-            <li><a href="#">Trodelas</a></li>
-            <li><a href="#">Flexo</a></li>
-          </ul>
-        </div>
-      </div>
     </div>
 
-    <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">SkillConnect</strong> <span>All Rights Reserved</span></p>
-      <div class="credits">
-        Built for demo by <strong>SkillConnect</strong> - powered by iLanding template
-      </div>
-    </div>
-  </footer>
 
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
- <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'vendor/php-email-form/validate.js' %}"></script>
-<script src="{% static 'vendor/aos/aos.js' %}"></script>
-<script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
-<script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
-<script src="{% static 'vendor/purecounter/purecounter_vanilla.js' %}"></script>
-
-  <!-- Main JS File (keeps your original if present) -->
-  <script src="{% static 'js/skillconnect.js'%}"></script>
-
-  <!-- Small inline script: fixes mobile nav & dropdowns so header works even if external JS fails -->
   <script>
 
 document.addEventListener("DOMContentLoaded", () => {

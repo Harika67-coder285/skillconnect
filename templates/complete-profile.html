@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Profile - SkillConnect</title>
+
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f2f6ff;
+      overflow-x: hidden;
+      padding-top: 60px;
+    }
+
+    .signup-wrapper {
+      max-width: 1000px;
+      margin: 5% auto;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden !important;
+    }
+
+    .signup-left {
+      background: linear-gradient(135deg, #4154f1 0%, #6576ff 100%);
+      padding: 40px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+    }
+
+    .signup-left img {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+      height: auto;
+    }
+
+    .signup-right {
+      padding: 40px 50px;
+    }
+
+    .btn-primary {
+      background-color: #4154f1;
+      border-color: #4154f1;
+    }
+
+    .btn-primary:hover {
+      background-color: #3244d5;
+    }
+
+    .home-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 999;
+    }
+
+    span.required {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="{% url 'home' %}" class="btn btn-outline-primary home-btn">Home</a>
+
+  <div class="signup-wrapper row">
+    <div class="col-lg-6 col-md-12 signup-left text-center text-lg-start">
+      <h2 class="fw-bold">Complete Your Profile</h2>
+      <p>Provide your details to get started on SkillConnect.</p>
+      <img src="{% static 'img/illustration-1.webp'%}" alt="Profile Illustration">
+    </div>
+
+    <div class="col-lg-6 col-md-12 signup-right">
+      <h3 class="fw-bold mb-3">Profile Details</h3>
+      <p class="text-muted">Fill in your information below</p>
+
+      <form id="signupForm" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Experience Level -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Experience Level <span class="required">*</span></label>
+          <select name="experience_level" class="form-select" required>
+            <option value="">Select level</option>
+            <option value="fresher">Fresher</option>
+            <option value="experienced">Experienced</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+
+        <!-- Resume -->
+        <div class="mb-3">
+          <label class="form-label">Resume Upload <span class="required">*</span></label>
+          <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
+          <small class="text-muted">Accepted formats: PDF, DOC, DOCX (Max 5 MB)</small>
+        </div>
+
+        <!-- LinkedIn -->
+        <div class="mb-3">
+          <label class="form-label">LinkedIn URL <span class="required">*</span></label>
+          <input type="url" name="linkedin" class="form-control" placeholder="https://www.linkedin.com/in/yourprofile" required>
+        </div>
+
+        <!-- Hourly Rate -->
+        <div class="mb-3">
+          <label class="form-label">Expected Hourly Rate ($) <span class="required">*</span></label>
+          <input type="number" name="hourly_rate" id="hourlyRate" class="form-control" placeholder="Enter hourly rate" required>
+        </div>
+        <div class="mb-3">
+          <p>Service Fee (10%): $<span id="serviceFee">0</span></p>
+          <p>Net Hourly Rate: $<span id="netRate">0</span></p>
+        </div>
+
+        <!-- Other Fields -->
+        <div class="mb-3">
+          <label class="form-label">Education <span class="required">*</span></label>
+          <input type="text" name="education" class="form-control" placeholder="Your education" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tech Stack <span class="required">*</span></label>
+          <input type="text" name="tech_stack" class="form-control" placeholder="e.g., HTML, CSS, JS" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Skills <span class="required">*</span></label>
+          <input type="text" name="skills" class="form-control" placeholder="Your skills" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date of Birth <span class="required">*</span></label>
+          <input type="date" name="dob" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone Number <span class="required">*</span></label>
+          <input type="tel" name="phone" class="form-control" placeholder="Enter phone number" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Address <span class="required">*</span></label>
+          <input type="text" name="address" class="form-control" placeholder="Your address" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Profile Photo <span class="required">*</span></label>
+          <input type="file" name="photo" class="form-control" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 mt-2">Save Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+    <div id="signupErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="signupErrorMsg">Error occurred!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+    <div id="signupSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="signupSuccessMsg">Profile updated successfully!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+ <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const hourlyInput = document.getElementById('hourlyRate');
+    const serviceFeeEl = document.getElementById('serviceFee');
+    const netRateEl = document.getElementById('netRate');
+
+    function updateRates() {
+      const hourly = parseFloat(hourlyInput.value) || 0;
+      const serviceFee = hourly * 0.10;
+      const netRate = hourly - serviceFee;
+      serviceFeeEl.innerText = serviceFee.toFixed(2);
+      netRateEl.innerText = netRate.toFixed(2);
+    }
+
+    hourlyInput.addEventListener('input', updateRates);
+    updateRates();
+
+    document.getElementById('signupForm').addEventListener('submit', function(e){
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch("{% url 'complete_profile' %}", {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.status === "success"){
+          const toastEl = new bootstrap.Toast(document.getElementById('signupSuccessToast'));
+          document.getElementById('signupSuccessMsg').innerText = data.message;
+          toastEl.show();
+          setTimeout(()=> { window.location.href = "{% url 'dashboard' %}"; }, 1500);
+        } else {
+          const toastEl = new bootstrap.Toast(document.getElementById('signupErrorToast'));
+          document.getElementById('signupErrorMsg').innerText = data.message;
+          toastEl.show();
+        }
+      })
+      .catch(err => console.error(err));
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+</head>
+<body>
+    <h2>Edit Profile</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Full Name:</label>
+        <input type="text" name="full_name" value="{{ app_user.full_name }}"><br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ app_user.email }}"><br><br>
+
+        {% if account_type == "freelancer" %}
+            <label>Experience Level:</label>
+            <input type="text" name="experience_level" value="{{ app_user.experience_level }}"><br><br>
+
+            <label>Hourly Rate:</label>
+            <input type="number" name="hourly_rate" value="{{ app_user.hourly_rate }}"><br><br>
+
+            <label>Education:</label>
+            <input type="text" name="education" value="{{ app_user.education }}"><br><br>
+
+            <label>Tech Stack:</label>
+            <input type="text" name="tech_stack" value="{{ app_user.tech_stack }}"><br><br>
+
+            <label>Skills:</label>
+            <input type="text" name="skills" value="{{ app_user.skills }}"><br><br>
+
+            <label>LinkedIn:</label>
+            <input type="url" name="linkedin" value="{{ app_user.linkedin }}"><br><br>
+
+            <label>Photo:</label>
+            <input type="file" name="photo"><br><br>
+
+            <label>Resume:</label>
+            <input type="file" name="resume"><br><br>
+        {% endif %}
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>

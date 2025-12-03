@@ -1,5 +1,7 @@
 from pathlib import Path
 from decouple import config
+import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
@@ -46,6 +48,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # ⭐️ ADD THIS LINE ⭐️
+                'users.context_processors.app_user',
             ],
         },
     },
@@ -58,6 +63,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # -------------------- DATABASE --------------------
 DATABASES = {
@@ -74,8 +82,6 @@ DATABASES = {
     }
 }
 
-
-# -------------------- LOGIN REDIRECT --------------------
 LOGIN_URL = "/login-page/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 
@@ -99,14 +105,6 @@ CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
-
-# If you want only frontend origins, add:
-"""
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-]
-"""
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -1,0 +1,148 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Deliver Work - SkillConnect</title>
+
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet" />
+
+  <style>
+    body {
+        background: #f7f7f7;
+        padding-top: 90px;
+    }
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    .card-box {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+    .btn-submit {
+        background: #007bff;
+        color: white;
+        border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER (same as your Find Work page) -->
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="container-fluid container-xl d-flex justify-content-between align-items-center">
+
+    <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto">
+      <img src="{% static 'img/logo.png'%}" alt="">
+      <h1 class="sitename">SkillConnect</h1>
+    </a>
+
+    <nav id="navmenu" class="navmenu">
+      <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'browse' %}">Browse</a></li>
+        <li><a href="{% url 'how_it_works' %}">How It Works</a></li>
+        <li id="profile-link" style="display:none;">
+            <a href="{% url 'dashboard' %}" class="profile-avatar">
+              <img src="{% static 'img/image.png' %}">
+            </a>
+        </li>
+        <li id="login-link"><a href="{% url 'login_page' %}" class="btn-getstarted">Login</a></li>
+        <li id="signup-link"><a href="{% url 'register_page' %}" class="btn-getstarted">Sign Up</a></li>
+        <li id="header-logout" style="display:none;"><a href="#" onclick="logoutHeader()">Logout</a></li>
+      </ul>
+    </nav>
+
+    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+  </div>
+</header>
+
+
+<div class="container">
+
+    <!-- Section 1: Active Contracts -->
+    <div class="card-box">
+        <h3 class="section-title">Your Active Contracts</h3>
+
+        <div class="mb-3">
+            <h5>Frontend Dashboard UI – React.js</h5>
+            <p>Client: <strong>Ashok Enterprises</strong></p>
+            <p>Status: <span class="text-success">In Progress</span></p>
+            <button class="btn btn-primary btn-sm">Submit Work</button>
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+            <h5>Python Automation Script</h5>
+            <p>Client: <strong>Orbit Solutions</strong></p>
+            <p>Status: <span class="text-success">In Progress</span></p>
+            <button class="btn btn-primary btn-sm">Submit Work</button>
+        </div>
+    </div>
+
+
+    <!-- Section 2: Contract History -->
+    <div class="card-box">
+        <h3 class="section-title">Contract History</h3>
+
+        <ul>
+            <li>Figma App UI Design – Completed (₹5,000)</li>
+            <li>Django API Development – Completed (₹20,000)</li>
+            <li>Portfolio Website – Completed (₹7,000)</li>
+        </ul>
+    </div>
+
+
+    <!-- Section 3: Hourly Work Diary -->
+    <div class="card-box">
+        <h3 class="section-title">Hourly Work Diary</h3>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Hours Worked</th>
+                    <th>Task</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>28 Nov 2025</td>
+                    <td>3 hrs</td>
+                    <td>Frontend dashboard layout</td>
+                </tr>
+                <tr>
+                    <td>29 Nov 2025</td>
+                    <td>2 hrs</td>
+                    <td>API integration</td>
+                </tr>
+                <tr>
+                    <td>30 Nov 2025</td>
+                    <td>4 hrs</td>
+                    <td>Bug fixes & testing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<script>
+function logoutHeader() {
+    window.location.href = "{% url 'logout_user' %}";
+}
+</script>
+
+</body>
+</html>

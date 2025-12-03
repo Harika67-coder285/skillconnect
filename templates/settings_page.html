@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings - SkillConnect</title>
+
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f5f7ff;
+      padding-top: 97px; /* Push content below fixed header */
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: #fff;
+      padding: 25px;
+      border-right: 1px solid #d8d8d8;
+      position: sticky;
+      top: 80px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      color: #333;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover,
+    .sidebar .active {
+      background: #4154f1;
+      color: #fff !important;
+    }
+
+    .settings-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      width: 100%;
+    }
+
+    .settings-card h4 {
+      margin-bottom: 20px;
+    }
+
+    .settings-card label {
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="{% static 'img/logo.png'%}" alt="SkillConnect Logo" />
+        <h1 class="sitename">SkillConnect</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'home' %}" class="active">Home</a></li>
+
+          <li id="categories-link" class="dropdown" style="display:none;">
+            <a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'browse' %}?cat=webdev">Web Development</a></li>
+              <li><a href="{% url 'browse' %}?cat=mobile">Mobile Apps</a></li>
+              <li><a href="{% url 'browse' %}?cat=datascience">Data Science</a></li>
+              <li><a href="{% url 'browse' %}?cat=design">Graphic & UI/UX Design</a></li>
+              <li><a href="{% url 'browse' %}?cat=writing">Content Writing</a></li>
+              <li><a href="{% url 'browse' %}?cat=marketing">Digital Marketing</a></li>
+              <li><a href="{% url 'browse' %}?cat=video">Video Editing</a></li>
+              <li><a href="{% url 'browse' %}?cat=ai">AI & Machine Learning</a></li>
+              <li><a href="{% url 'browse' %}?cat=business">Business & Finance</a></li>
+            </ul>
+          </li>
+
+          <li><a href="{% url 'browse' %}" id="browse-link"></a></li>
+          <li><a href="{% url 'how_it_works' %}">Find Work</a></li>
+
+          <!-- Profile Avatar -->
+          <li id="profile-link" style="display:none;">
+            <a href="{% url 'dashboard' %}" class="profile-avatar">
+              {% if app_user and app_user.photo %}
+              <img src="{{ app_user.photo.url }}">
+              {% else %}
+              <img src="{% static 'img/image.png' %}">
+              {% endif %}
+            </a>
+          </li>
+
+          <!-- Login / Signup -->
+          <li id="login-link"><a href="{% url 'login_page' %}" class="btn-getstarted">Login</a></li>
+          <li id="signup-link"><a href="{% url 'register_page' %}" class="btn-getstarted">Sign Up</a></li>
+
+          <!-- Logout -->
+          <li id="header-logout" style="display:none;">
+            <a href="javascript:void(0)" onclick="logoutHeader()" class="btn-getstarted" style="padding:10px">Logout</a>
+          </li>
+        </ul>
+
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD -->
+  <div class="container-fluid mt-4">
+    <div class="row">
+
+      <!-- SIDEBAR -->
+      <div class="col-md-3 sidebar">
+        <a href="{% url 'dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="{% url 'my_projects' %}"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
+        <a href="{% url 'client_requests' %}"><i class="bi bi-people me-2"></i> Client Requests</a>
+        <a href=""><i class="bi bi-chat-dots me-2"></i> Messages</a>
+        <a href="{% url 'settings_page' %}" class="active"><i class="bi bi-gear me-2"></i> Settings</a>
+        <a href="#" onclick="logoutHeader()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+      </div>
+
+      <!-- SETTINGS CENTER -->
+      <div class="col-md-9 d-flex justify-content-center">
+        <div class="settings-card">
+
+          <h4>Account Settings</h4>
+
+          <form method="POST" action="{% url 'update_profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Picture -->
+            <div class="mb-3 text-center">
+              {% if app_user.photo %}
+              <img src="{{ app_user.photo.url }}" alt="Profile Picture" class="rounded-circle" width="120">
+              {% else %}
+              <img src="{% static 'img/avatar-1.webp' %}" alt="Profile Picture" class="rounded-circle" width="120">
+              {% endif %}
+
+              <div class="mt-2">
+                <label class="edit-photo">
+                  <i class="bi bi-pencil-square"></i> Change Picture
+                  <input type="file" name="photo" style="display:none;" id="photoInput">
+                </label>
+                <button type="button" class="btn btn-sm btn-primary mt-2" onclick="submitPhoto()">Upload</button>
+              </div>
+            </div>
+
+            <!-- Full Name -->
+            <div class="mb-3">
+              <label for="full_name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="full_name" name="full_name" value="{{ app_user.full_name }}">
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" value="{{ app_user.email }}">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label">New Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password">
+            </div>
+
+            <!-- Experience Level -->
+            <div class="mb-3">
+              <label for="experience_level" class="form-label">Experience Level</label>
+              <input type="text" class="form-control" id="experience_level" name="experience_level" value="{{ app_user.experience_level }}">
+            </div>
+
+            <!-- Hourly Rate -->
+            <div class="mb-3">
+              <label for="hourly_rate" class="form-label">Hourly Rate</label>
+              <input type="number" class="form-control" id="hourly_rate" name="hourly_rate" value="{{ app_user.hourly_rate }}">
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="mb-3">
+              <label for="tech_stack" class="form-label">Tech Stack</label>
+              <input type="text" class="form-control" id="tech_stack" name="tech_stack" value="{{ app_user.tech_stack }}">
+            </div>
+
+            <!-- Skills -->
+            <div class="mb-3">
+              <label for="skills" class="form-label">Skills</label>
+              <input type="text" class="form-control" id="skills" name="skills" value="{{ app_user.skills }}">
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="mb-3">
+              <label for="linkedin" class="form-label">LinkedIn URL</label>
+              <input type="url" class="form-control" id="linkedin" name="linkedin" value="{{ app_user.linkedin }}">
+            </div>
+
+            <!-- Resume Upload -->
+            <div class="mb-3">
+              <label for="resume" class="form-label">Resume</label>
+              <input type="file" class="form-control" id="resume" name="resume">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const userId = "{{ request.session.user_id|default:'' }}";
+    const accountType = "{{ request.session.account_type|default:''|escapejs }}";
+
+    const profileLink = document.getElementById("profile-link");
+    const loginLink = document.getElementById("login-link");
+    const signupLink = document.getElementById("signup-link");
+    const headerLogout = document.getElementById("header-logout");
+    const browseLink = document.getElementById("browse-link");
+    const categoriesLink = document.getElementById("categories-link"); // 👈 new
+
+    if (userId) {
+        if (profileLink) profileLink.style.display = "flex";
+        if (headerLogout) headerLogout.style.display = "block";
+        if (loginLink) loginLink.style.display = "none";
+        if (signupLink) signupLink.style.display = "none";
+        if (browseLink && accountType!== "freelancer") {
+            browseLink.style.display = "block";
+            browseLink.innerText = "Find Freelancers";
+        }
+        if (browseLink && accountType=== "freelancer") {
+            browseLink.style.display = "none";
+        }
+        if (categoriesLink && accountType!== "freelancer") categoriesLink.style.display = "block"; // 👈 show categories for logged-in users
+        if (categoriesLink && accountType=== "freelancer") categoriesLink.style.display = "none"; // 👈 show categories for logged-in users
+
+    } else {
+        if (profileLink) profileLink.style.display = "none";
+        if (headerLogout) headerLogout.style.display = "none";
+        if (loginLink) loginLink.style.display = "block";
+        if (signupLink) signupLink.style.display = "block";
+        if (browseLink) browseLink.style.display = "none";
+        if (categoriesLink) categoriesLink.style.display = "none"; // 👈 hide categories for guests
+    }
+});
+
+function logoutHeader() {
+    window.location.href = "{% url 'logout_user' %}";
+}
+</script>
+
+
+</body>
+</html>

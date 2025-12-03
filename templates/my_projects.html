@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>User Dashboard - SkillConnect</title>
+  <title>My Projects - SkillConnect</title>
 
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
@@ -42,33 +42,20 @@
       color: #fff !important;
     }
 
-    .profile-card {
+    .content-card {
       background: #fff;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      text-align: center;
+      width: 100%;
     }
 
-    .profile-card img {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
+    .project-item {
+      padding: 12px 15px;
+      border: 1px solid #d8d8d8;
+      border-radius: 8px;
       margin-bottom: 10px;
-    }
-
-    .edit-photo {
-      display: inline-block;
-      margin-bottom: 20px;
-      cursor: pointer;
-      color: #4154f1;
-    }
-
-    .profile-info p {
-      text-align: left;
-      margin: 5px 0;
+      background: #f9f9f9;
     }
   </style>
 </head>
@@ -147,52 +134,31 @@
 
       <!-- SIDEBAR -->
       <div class="col-md-3 sidebar">
-        <a href="#" class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-        <a href="{%url 'my_projects'%}"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
-        <a href="{%url 'client_requests'%}"><i class="bi bi-people me-2"></i> Client Requests</a>
+        <a href="{% url 'dashboard' %}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="{% url 'my_projects' %}" class="active"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
+        <a href="{% url 'client_requests' %}"><i class="bi bi-people me-2"></i> Client Requests</a>
         <a href="#"><i class="bi bi-chat-dots me-2"></i> Messages</a>
         <a href="{%url 'settings_page'%}"><i class="bi bi-gear me-2"></i> Settings</a>
         <a href="#" onclick="logoutHeader()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
       </div>
 
-      <!-- PROFILE CENTER -->
+      <!-- CENTER CONTENT -->
       <div class="col-md-9 d-flex justify-content-center">
-        <div class="profile-card w-75">
+        <div class="content-card">
 
-          <!-- Profile Image -->
-          {% if app_user.photo %}
-          <img src="{{ app_user.photo.url }}" alt="Profile Picture">
+          <h3>My Projects</h3>
+
+          {% if projects %}
+            {% for project in projects %}
+              <div class="project-item">
+                <h5>{{ project.title }}</h5>
+                <p>{{ project.description }}</p>
+                <p><strong>Status:</strong> {{ project.status }}</p>
+              </div>
+            {% endfor %}
           {% else %}
-          <img src="{% static 'img/avatar-1.webp' %}" alt="Profile Picture">
+            <p>No projects yet.</p>
           {% endif %}
-
-          <!-- Edit Picture Form (pencil icon) -->
-          <form action="{% url 'edit_profile_picture' %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <label class="edit-photo">
-              <i class="bi bi-pencil-square"></i> Edit Picture
-              <input type="file" name="photo" style="display:none;" onchange="this.form.submit()">
-            </label>
-          </form>
-
-          <!-- User Info -->
-          <div class="profile-info mt-3 text-start">
-            <p><strong>Full Name:</strong> {{ app_user.full_name }}</p>
-            <p><strong>Email:</strong> {{ app_user.email }}</p>
-            <p><strong>Experience Level:</strong> {{ app_user.experience_level }}</p>
-            <p><strong>Hourly Rate:</strong> ${{ app_user.hourly_rate }}</p>
-            <p><strong>Education:</strong> {{ app_user.education }}</p>
-            <p><strong>Tech Stack:</strong> {{ app_user.tech_stack }}</p>
-            <p><strong>Skills:</strong> {{ app_user.skills }}</p>
-            <p><strong>LinkedIn:</strong> <a href="{{ app_user.linkedin }}" target="_blank">{{ app_user.linkedin }}</a></p>
-            <p><strong>Resume:</strong>
-              {% if app_user.resume %}
-              <a href="{{ app_user.resume.url }}" target="_blank">Download</a>
-              {% else %}
-              Not uploaded
-              {% endif %}
-            </p>
-          </div>
 
         </div>
       </div>
