@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Freelancing Chatbot</title>
+    <style>
+        body { font-family: Arial; background: #f2f2f2; margin:0; }
+
+        /* Floating chat button */
+        #chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4e73df;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            z-index: 1000;
+        }
+        #chat-btn:hover { background: #2e59d9; }
+
+        /* Chat window */
+        #chatbox {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity:0; }
+            to { transform: translateY(0); opacity:1; }
+        }
+
+        #chat-header {
+            background: #4e73df;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-header span { cursor: pointer; font-size:18px; }
+
+        #chat-header a.back-arrow {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        #chat-header a.back-arrow:hover { color: #d1d5f0; }
+
+        #messages {
+            flex:1;
+            padding: 10px;
+            overflow-y:auto;
+            background: #f9f9f9;
+        }
+
+        .msg { margin: 8px 0; padding:10px 14px; border-radius: 15px; max-width:80%; word-wrap: break-word; }
+        .user { background:#4e73df; color:white; align-self:flex-end; }
+        .bot { background:#e2e3f3; color:#333; align-self:flex-start; }
+        .loader { font-style: italic; color: gray; }
+
+        #input-area {
+            display:flex;
+            border-top:1px solid #ddd;
+        }
+        #user_input {
+            flex:1;
+            padding:12px;
+            border:none;
+            outline:none;
+            font-size:14px;
+        }
+        #send_btn {
+            padding:12px 16px;
+            background:#4e73df;
+            color:white;
+            border:none;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        #send_btn:hover { background:#2e59d9; }
+    </style>
+</head>
+<body>
+
+<!-- Floating chat button -->
+<button id="chat-btn">💬</button>
+
+<!-- Chat window -->
+<div id="chatbox">
+    <div id="chat-header">
+        <a href="{% url 'dashboard' %}" class="back-arrow">←</a>
+        Support Chat
+        <span id="close-chat">×</span>
+    </div>
+    <div id="messages"></div>
+    <div id="input-area">
+        <input id="user_input" type="text" placeholder="Ask a question..." />
+        <button id="send_btn">Send</button>
+    </div>
+</div>
+
+<script>
+// Toggle chat window
+const chatBtn = document.getElementById("chat-btn");
+const chatbox = document.getElementById("chatbox");
+const closeBtn = document.getElementById("close-chat");
+
+chatBtn.addEventListener("click", () => chatbox.style.display = "flex");
+closeBtn.addEventListener("click", () => chatbox.style.display = "none");
+
+// CSRF helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = cookie.substring(name.length + 1);
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Chat functions
+function appendMessage(text, sender, loader=false) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msg", sender);
+    if(loader) msgDiv.classList.add("loader");
+    msgDiv.innerText = text;
+    document.getElementById("messages").appendChild(msgDiv);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+    return msgDiv;
+}
+
+function sendMessage() {
+    const input = document.getElementById("user_input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage(message, "user");
+    input.value = "";
+
+    const loaderDiv = appendMessage("Bot is typing...", "bot", true);
+
+    fetch("/chatbot/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        loaderDiv.remove();
+        appendMessage(data.reply, "bot");
+    })
+    .catch(err => {
+        loaderDiv.remove();
+        appendMessage("Error: Could not reach server.", "bot");
+        console.error(err);
+    });
+}
+
+// Button click & Enter key
+document.getElementById("send_btn").addEventListener("click", sendMessage);
+document.getElementById("user_input").addEventListener("keydown", function(e) {
+    if(e.key==="Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>

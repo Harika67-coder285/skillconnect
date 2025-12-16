@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -9,67 +10,110 @@
 
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link href="{% static 'css/main.css' %}" rel="stylesheet">
-
   <style>
     body {
       background: #f5f7ff;
-      padding-top: 97px; /* Push content below fixed header */
+      padding-top: 20px; /* Push content below fixed header */
     }
+       
+        #chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4e73df;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            z-index: 1000;
+        }
+        #chat-btn:hover { background: #2e59d9; }
 
-    .sidebar {
-      height: 100vh;
-      background: #fff;
-      padding: 25px;
-      border-right: 1px solid #d8d8d8;
-      position: sticky;
-      top: 80px;
-    }
+        /* Chat window */
+        #chatbox {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
 
-    .sidebar a {
-      display: block;
-      padding: 12px 15px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      color: #333;
-      font-weight: 500;
-      text-decoration: none;
-    }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity:0; }
+            to { transform: translateY(0); opacity:1; }
+        }
 
-    .sidebar a:hover,
-    .sidebar .active {
-      background: #4154f1;
-      color: #fff !important;
-    }
+        #chat-header {
+            background: #4e73df;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-header span { cursor: pointer; font-size:18px; }
 
-    .profile-card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      text-align: center;
-    }
+        #chat-header a.back-arrow {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        #chat-header a.back-arrow:hover { color: #d1d5f0; }
 
-    .profile-card img {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-      margin-bottom: 10px;
-    }
+        #messages {
+            flex:1;
+            padding: 10px;
+            overflow-y:auto;
+            background: #f9f9f9;
+        }
 
-    .edit-photo {
-      display: inline-block;
-      margin-bottom: 20px;
-      cursor: pointer;
-      color: #4154f1;
-    }
+        .msg { margin: 8px 0; padding:10px 14px; border-radius: 15px; max-width:80%; word-wrap: break-word; }
+        .user { background:#4e73df; color:white; align-self:flex-end; }
+        .bot { background:#e2e3f3; color:#333; align-self:flex-start; }
+        .loader { font-style: italic; color: gray; }
 
-    .profile-info p {
-      text-align: left;
-      margin: 5px 0;
-    }
+        #input-area {
+            display:flex;
+            border-top:1px solid #ddd;
+        }
+        #user_input {
+            flex:1;
+            padding:12px;
+            border:none;
+            outline:none;
+            font-size:14px;
+        }
+        #send_btn {
+            padding:12px 16px;
+            background:#4e73df;
+            color:white;
+            border:none;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        #send_btn:hover { background:#2e59d9; }
+   
   </style>
 </head>
 
@@ -143,67 +187,139 @@
 
   <!-- MAIN DASHBOARD -->
   <div class="container-fluid mt-4">
-    <div class="row">
+   <div class="layout">
 
-      <!-- SIDEBAR -->
-      <div class="col-md-3 sidebar">
-        <a href="#" class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-        <a href="{%url 'my_projects'%}"><i class="bi bi-folder2-open me-2"></i> My Projects</a>
-        <a href="{%url 'client_requests'%}"><i class="bi bi-people me-2"></i> Client Requests</a>
-        <a href="#"><i class="bi bi-chat-dots me-2"></i> Messages</a>
-        <a href="{%url 'settings_page'%}"><i class="bi bi-gear me-2"></i> Settings</a>
-        <a href="#" onclick="logoutHeader()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
-      </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2 class="logo">Dashboard</h2>
 
-      <!-- PROFILE CENTER -->
-      <div class="col-md-9 d-flex justify-content-center">
-        <div class="profile-card w-75">
+        <nav>
+            <a href="#" class="active">
+                <span>📊</span> Dashboard
+            </a>
+            <a href="#"><span>💼</span> Jobs</a>
+            <a href="#"><span>💬</span> Messages</a>
+            <a href="#"><span>👛</span> Wallet</a>
+        </nav>
+    </aside>
 
-          <!-- Profile Image -->
-          {% if app_user.photo %}
-          <img src="{{ app_user.photo.url }}" alt="Profile Picture">
-          {% else %}
-          <img src="{% static 'img/avatar-1.webp' %}" alt="Profile Picture">
-          {% endif %}
+    <!-- Main Content -->
+    <main class="content">
 
-          <!-- Edit Picture Form (pencil icon) -->
-          <form action="{% url 'edit_profile_picture' %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <label class="edit-photo">
-              <i class="bi bi-pencil-square"></i> Edit Picture
-              <input type="file" name="photo" style="display:none;" onchange="this.form.submit()">
-            </label>
-          </form>
+        <header class="topbar">
+            <h3>❓ Help Center</h3>
+            <div class="icons">
+                <span class="bell">🔔</span>
+                <span class="user">👤</span>
+            </div>
+        </header>
 
-          <!-- User Info -->
-          <div class="profile-info mt-3 text-start">
-            <p><strong>Full Name:</strong> {{ app_user.full_name }}</p>
-            <p><strong>Email:</strong> {{ app_user.email }}</p>
-            <p><strong>Experience Level:</strong> {{ app_user.experience_level }}</p>
-            <p><strong>Hourly Rate:</strong> ${{ app_user.hourly_rate }}</p>
-            <p><strong>Education:</strong> {{ app_user.education }}</p>
-            <p><strong>Tech Stack:</strong> {{ app_user.tech_stack }}</p>
-            <p><strong>Skills:</strong> {{ app_user.skills }}</p>
-            <p><strong>LinkedIn:</strong> <a href="{{ app_user.linkedin }}" target="_blank">{{ app_user.linkedin }}</a></p>
-            <p><strong>Resume:</strong>
-              {% if app_user.resume %}
-              <a href="{{ app_user.resume.url }}" target="_blank">Download</a>
-              {% else %}
-              Not uploaded
-              {% endif %}
-            </p>
-          </div>
+        <h1 class="title">Analytics Dashboard</h1>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <p>Jobs Applied</p>
+                <h2>12</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Earnings (12 months)</p>
+                <h2>$12,540</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Profile Views</p>
+                <h2>730</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Impressions & Clicks</p>
+                <h2>1,200</h2>
+            </div>
 
         </div>
-      </div>
 
+        <!-- Chart -->
+        <div class="chart-card">
+            <canvas id="earnChart"></canvas>
+        </div>
+
+    </main>
+
+    <!-- Right Profile Panel -->
+    <aside class="profile-panel">
+
+        <h2>Profile</h2>
+
+        <div class="avatar">
+            <a href="{% url 'dashboard' %}" class="">
+        {% if app_user and app_user.photo %}
+    <img src="{{ app_user.photo.url }}">
+{% else %}
+    <img src="{% static 'img/image.png' %}">
+{% endif %}
+
+    </a>
+
+        </div>
+
+        <ul class="profile-menu">
+            <li>Editing Options</li>
+            <li>Personal Info</li>
+            <li>Portfolio</li>
+            <li>Theme Changing</li>
+            <li>Account Settings</li>
+            <li>Contact Info</li>
+            <li>Profile Setting</li>
+            <li>My Profile</li>
+            <li>Password & Security</li>
+        </ul>
+
+    </aside>
+
+</div>
+<!-- Floating Chat Icon -->
+<button id="chat-btn">💬</button>
+<div id="chatbox" style="display: none;">
+    <div id="chat-header">
+        <a href="{% url 'dashboard' %}" class="back-arrow">←</a>
+        Support Chat
+        <span id="close-chat">×</span>
     </div>
+    <div id="messages"></div>
+    <div id="input-area">
+        <input id="user_input" type="text" placeholder="Ask a question..." />
+        <button id="send_btn">Send</button>
+    </div>
+</div>
   </div>
 
 <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+  
 document.addEventListener("DOMContentLoaded", () => {
+  const ctx = document.getElementById('earnChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
+        datasets: [{
+            label: "Earnings",
+            data: [1, 2, 1.5, 2.5, 3, 4, 3.5, 5, 4.8, 5.5, 6],
+            fill: true,
+            borderWidth: 3,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false }},
+    }
+});
     const userId = "{{ request.session.user_id|default:'' }}";
     const accountType = "{{ request.session.account_type|default:''|escapejs }}";
 
@@ -237,12 +353,84 @@ document.addEventListener("DOMContentLoaded", () => {
         if (browseLink) browseLink.style.display = "none";
         if (categoriesLink) categoriesLink.style.display = "none"; // 👈 hide categories for guests
     }
+// Toggle chat window
+const chatBtn = document.getElementById("chat-btn");
+const chatbox = document.getElementById("chatbox");
+const closeBtn = document.getElementById("close-chat");
+
+chatBtn.addEventListener("click", () => chatbox.style.display = "flex");
+closeBtn.addEventListener("click", () => chatbox.style.display = "none");
+
+// CSRF helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = cookie.substring(name.length + 1);
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Chat functions
+function appendMessage(text, sender, loader=false) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msg", sender);
+    if(loader) msgDiv.classList.add("loader");
+    msgDiv.innerText = text;
+    document.getElementById("messages").appendChild(msgDiv);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+    return msgDiv;
+}
+
+function sendMessage() {
+    const input = document.getElementById("user_input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage(message, "user");
+    input.value = "";
+
+    const loaderDiv = appendMessage("Bot is typing...", "bot", true);
+
+    fetch("/chatbot/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        loaderDiv.remove();
+        appendMessage(data.reply, "bot");
+    })
+    .catch(err => {
+        loaderDiv.remove();
+        appendMessage("Error: Could not reach server.", "bot");
+        console.error(err);
+    });
+}
+
+// Button click & Enter key
+document.getElementById("send_btn").addEventListener("click", sendMessage);
+document.getElementById("user_input").addEventListener("keydown", function(e) {
+    if(e.key==="Enter") sendMessage();
+});
+
 });
 
 function logoutHeader() {
     window.location.href = "{% url 'logout_user' %}";
 }
+
 </script>
 
 </body>
-</html>
+</html> 

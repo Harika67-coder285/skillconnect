@@ -6,10 +6,12 @@ from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import timedelta
-from .models import Freelancer, Recruiter, OTP
+from .models import Freelancer, Recruiter, OTP,Job,Application
 from django.conf import settings
 import json
 # ---------- Pages ----------
+def chatbox(request):
+    return render(request,"chatbox.html")
 def home(request): return render(request, "index.html")
 def browse_page(request): return render(request, "browse.html")
 def how_it_works_page(request): return render(request, "howitworks.html")
@@ -423,3 +425,177 @@ def update_profile(request):
         return redirect("settings_page")
 
     return render(request, "settings_page.html", {"app_user": freelancer})
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from google import genai
+import os
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+# Configure your Gemini API key here
+genai_client = genai.Client(api_key=GEMINI_API_KEY)
+
+import time
+@csrf_exempt
+def chatbot(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user_message = data.get("message", "").strip()
+        if not user_message:
+            return JsonResponse({"reply": "Please type a message!"})
+
+        bot_reply = "Sorry, something went wrong."
+        for attempt in range(3):  # Retry up to 3 times
+            try:
+                response = genai_client.models.generate_content(
+                    model="models/gemini-2.5-flash",  # Free, fast model
+                    contents=[user_message]
+                )
+                bot_reply = response.text
+                break  # Success, exit retry loop
+            except Exception as e:
+                if "503" in str(e):
+                    bot_reply = "Bot is busy, retrying..."
+                    time.sleep(2)  # wait 2 sec before retry
+                    continue
+                else:
+                    bot_reply = f"Error: {str(e)}"
+                    break
+
+        return JsonResponse({"reply": bot_reply})
+    
+    return JsonResponse({"reply": "Invalid request"}, status=400)
+def post_job(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+
+    if request.method == "POST":
+        Job.objects.create(
+            recruiter=recruiter,
+            title=request.POST.get("title"),
+            description=request.POST.get("description")
+        )
+        return redirect("my_jobs")
+
+    return render(request, "post_job.html")
+def recruiter_applications(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+
+    applications = JobApplication.objects.filter(
+        job__recruiter=recruiter
+    ).select_related("job", "freelancer")
+
+    return render(request, "applications.html", {
+        "applications": applications
+    })
+def update_application_status(request, app_id, action):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    application = JobApplication.objects.get(id=app_id)
+
+    if action == "accept":
+        application.status = "accepted"
+        subject = "Application Accepted 🎉"
+        message = f"""
+Hi {application.freelancer.full_name},
+
+Congratulations! 🎉
+Your application for "{application.job.title}" has been accepted.
+
+Recruiter will contact you soon.
+"""
+    else:
+        application.status = "rejected"
+        subject = "Application Update"
+        message = f"""
+Hi {application.freelancer.full_name},
+
+Thank you for applying to "{application.job.title}".
+Unfortunately, your application was not selected.
+"""
+
+    application.save()
+
+    send_mail(
+        subject,
+        message,
+        settings.EMAIL_HOST_USER,
+        [application.freelancer.email],
+        fail_silently=False,
+    )
+
+    return redirect("recruiter_applications")
+def apply_job(request, job_id):
+    if request.session.get("account_type") != "freelancer":
+        return redirect("login_page")
+
+    freelancer = Freelancer.objects.get(id=request.session["user_id"])
+    job = Job.objects.get(id=job_id)
+
+    JobApplication.objects.create(
+        job=job,
+        freelancer=freelancer,
+        resume=freelancer.resume
+    )
+
+    return redirect("browse")
+def my_jobs(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+    jobs = Job.objects.filter(recruiter=recruiter)
+
+    return render(request, "my_jobs.html", {"jobs": jobs})
+def job_applications(request, job_id):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter_id = request.session.get("user_id")
+    job = Job.objects.get(id=job_id, recruiter_id=recruiter_id)
+
+    applications = Application.objects.filter(job=job)
+
+    return render(request, "job_applications.html", {"job": job, "applications": applications})
+
+def edit_job(request, job_id):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    job = Job.objects.get(id=job_id)
+
+    if request.method == "POST":
+        job.title = request.POST.get("title")
+        job.description = request.POST.get("description")
+        job.save()
+        return redirect("my_jobs")
+
+    return render(request, "edit_job.html", {"job": job})
+from django.shortcuts import get_object_or_404
+
+def delete_job(request, job_id):
+    # Allow only recruiters
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter_id = request.session.get("user_id")
+
+    # Get job only if it belongs to this recruiter
+    job = get_object_or_404(
+        Job,
+        id=job_id,
+        recruiter_id=recruiter_id
+    )
+
+    if request.method == "POST":
+        job.delete()
+        return redirect("my_jobs")
+
+    return render(request, "confirm_delete_job.html", {"job": job})

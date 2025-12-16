@@ -1,11 +1,14 @@
 from pathlib import Path
 from decouple import config
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool)
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -51,6 +54,8 @@ TEMPLATES = [
 
                 # ⭐️ ADD THIS LINE ⭐️
                 'users.context_processors.app_user',
+                "users.context_processors.recruiter_job_count",
+
             ],
         },
     },
@@ -95,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # -------------------- INTERNATIONALIZATION --------------------
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
@@ -112,3 +117,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+

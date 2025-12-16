@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h2>Applications for {{ job.title }}</h2>
+
+{% for app in applications %}
+<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    <p><strong>Freelancer:</strong> {{ app.freelancer.full_name }}</p>
+    <p><strong>Cover Letter:</strong> {{ app.cover_letter }}</p>
+    <p><strong>Status:</strong> {{ app.status }}</p>
+
+    <a href="{% url 'update_application_status' app.id 'accepted' %}">Accept</a> |
+    <a href="{% url 'update_application_status' app.id 'rejected' %}">Reject</a>
+</div>
+{% empty %}
+<p>No applications yet.</p>
+{% endfor %}
+
+
+</body>
+</html>

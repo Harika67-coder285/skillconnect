@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h2>Job Applications</h2>
+
+{% for app in applications %}
+<div>
+  <p>
+    <b>{{ app.freelancer.full_name }}</b> applied for
+    <b>{{ app.job.title }}</b>
+  </p>
+
+  <p>Status: {{ app.status }}</p>
+
+  {% if app.status == "pending" %}
+    <a href="{% url 'update_application_status' app.id 'accept' %}">Accept</a>
+    <a href="{% url 'update_application_status' app.id 'reject' %}">Reject</a>
+  {% endif %}
+</div>
+<hr>
+{% empty %}
+<p>No applications yet.</p>
+{% endfor %}
+
+</body>
+</html>

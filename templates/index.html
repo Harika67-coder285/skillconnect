@@ -30,11 +30,15 @@
 <link href="{% static 'vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet" />
 
 <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+<style>
+  .badge {
+  font-size: 11px;
+  padding: 4px 6px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
 
-  <!--
-    Template Name: SkillConnect (based on iLanding)
-    Updated: Nov 12 2024 with Bootstrap v5.3.3
-  -->
+</style>
 </head>
 
 <body class="index-page">
@@ -75,6 +79,21 @@
     <li><a href="{% url 'browse' %}" id="browse-link"></a></li>
 
     <li><a href="{% url 'how_it_works' %}">Find Work</a></li>
+    {% if request.session.account_type == "recruiter" %}
+        <li>
+          <a href="{% url 'my_jobs' %}">
+            My Jobs
+            <span class="badge bg-primary">{{ job_count }}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'post_job' %}" class="btn btn-primary" style="padding:10px;color:white">
+            <i class="bi bi-plus-lg"></i> Post Job
+          </a>
+        </li>
+        {% endif %}
+
 
     <!-- Profile Avatar -->
 <!-- Profile Avatar -->

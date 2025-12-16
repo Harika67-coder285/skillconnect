@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Optional: Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .post-job-container {
+            max-width: 700px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .post-job-container h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+            text-align: center;
+        }
+        label {
+            font-weight: 500;
+        }
+        textarea {
+            resize: none;
+        }
+        button {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="post-job-container">
+    <h2>Post a New Job</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Job Title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter job title" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Job Description</label>
+            <textarea class="form-control" id="description" name="description" rows="6" placeholder="Enter job description" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
+    </form>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
