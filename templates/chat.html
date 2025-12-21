@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+
+<h2>Chat</h2>
+
+<div style="border:1px solid #000; height:300px; overflow:auto;">
+    {% for msg in messages %}
+        <p>
+            {{ msg.message }}
+            <small>({{ msg.created_at }})</small>
+        </p>
+    {% endfor %}
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="message" placeholder="Type message" required>
+    <input type="file" name="file">
+    <button type="submit">Send</button>
+</form>
+
+</body>
+</html>

@@ -28,3 +28,24 @@ def recruiter_job_count(request):
     return {
         "job_count": job_count
     }
+from .models import Freelancer, Notification
+
+def freelancer_notifications(request):
+    if request.session.get("account_type") == "freelancer":
+        try:
+            freelancer = Freelancer.objects.get(id=request.session.get("user_id"))
+            notifications = Notification.objects.filter(
+                freelancer=freelancer,
+                is_read=False
+            )
+            return {
+                "freelancer_notifications": notifications,
+                "notification_count": notifications.count()
+            }
+        except Freelancer.DoesNotExist:
+            pass
+
+    return {
+        "freelancer_notifications": [],
+        "notification_count": 0
+    }

@@ -9,7 +9,7 @@ from users.views import (
     dashboard, login_page, register_page, verify_otp_page,logout_user,complete_profile,my_projects,messages,client_requests,edit_profile_picture,settings_page,update_profile,chatbox,chatbot, post_job,
     recruiter_applications,
     update_application_status,
-    apply_job,my_jobs,job_applications,edit_job,delete_job
+    apply_job,my_jobs,job_applications,edit_job,delete_job,search_freelancers,hired_talent,create_direct_contract,recruiter_analysis,chat_view,financial_reports,work_dashboard,contract_timesheets,schedule_interview,chat,applications,interviews,contracts,reports,analysis,browse_freelancers,freelancer_contracts,contract_action
 )
 
 urlpatterns = [
@@ -18,9 +18,20 @@ urlpatterns = [
     path('register/', register_user, name="register_user"),
 path('login/', login_user, name='login_user'),
 path("logout/", logout_user, name="logout_user"),
+path("interviews/", interviews, name="interviews"),
+    # Messages
+    path("messages/", messages, name="messages"),
 
+    # Contracts / Work
+    path("contracts/", contracts, name="contracts"),
+
+    # Reports
+    path("reports/", reports, name="reports"),
+
+    # Analysis
+    path("analysis/", analysis, name="analysis"),
     path('verify-otp/', verify_otp, name="verify_otp"),
-    path('browse/', browse_page, name="browse"),
+    path('browse/', browse_freelancers, name="browse"),
     path('how-it-works/', how_it_works_page, name="how_it_works"),
     path('dashboard/', dashboard, name="dashboard"),
     path('login-page/', login_page, name="login_page"),
@@ -35,8 +46,10 @@ path("logout/", logout_user, name="logout_user"),
     path("chat-box/",chatbox,name='chat-box'),
     path("chatbot/", chatbot, name="chatbot"),
     path("post-job/", post_job, name="post_job"),
-path("applications/", recruiter_applications, name="recruiter_applications"),
-path("application/<int:app_id>/<str:action>/", update_application_status, name="update_application_status"),
+     path("applications/", applications, name="applications"),
+    path("applications/<int:job_id>/", recruiter_applications, name="recruiter_applications"),
+path("application/update/<int:app_id>/", update_application_status, name="update_application_status"),
+
 path("apply-job/<int:job_id>/", apply_job, name="apply_job"),
 path("my-jobs/", my_jobs, name="my_jobs"),
 path(
@@ -55,6 +68,40 @@ path(
     name="delete_job"
 ),
 
+ path(
+        "chat/<int:recruiter_id>/<int:freelancer_id>/",
+        chat_view,
+        name="chat"
+    ),
+path('search-freelancers/', search_freelancers, name='search_freelancers'),
+path('hired-talent/', hired_talent, name='hired_talent'),
+path('direct-contract/<int:freelancer_id>/', create_direct_contract, name='direct_contract'),
+path('recruiter/analysis/', recruiter_analysis, name='recruiter_analysis'),
+path("freelancer/contracts/", freelancer_contracts, name="freelancer_contracts"),
+path(
+    "contract-action/<int:contract_id>/",
+contract_action,
+    name="contract_action"
+),
+
+path(
+        "reports/<int:recruiter_id>/",
+        financial_reports,
+        name="financial_reports"
+    ),
+     path(
+        "work/<int:recruiter_id>/",
+       work_dashboard,
+        name="work_dashboard"
+    ),
+    path(
+        "timesheets/<int:contract_id>/",
+ contract_timesheets,
+        name="contract_timesheets"
+    ),
+    path("interview/schedule/<int:application_id>/", schedule_interview, name="schedule_interview"),
+path("chat/<int:recruiter_id>/<int:freelancer_id>/", chat, name="chat"),
+path("contracts/", contracts, name="contracts"),
 
 ]
 if settings.DEBUG:

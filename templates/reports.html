@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financial Reports</title>
+</head>
+<body>
+
+<h2>Financial Reports</h2>
+
+<h3>Weekly Summary</h3>
+<p><strong>Paid this week:</strong> ₹{{ weekly_total_paid }}</p>
+<p><strong>Pending this week:</strong> ₹{{ weekly_pending }}</p>
+
+<hr>
+
+<h3>Overall Summary</h3>
+<p><strong>Total Paid:</strong> ₹{{ total_paid }}</p>
+<p><strong>Total Pending:</strong> ₹{{ total_pending }}</p>
+
+<hr>
+
+<h3>Transaction History</h3>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Freelancer</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
+
+    {% for tx in transactions %}
+    <tr>
+        <td>{{ tx.contract.freelancer.full_name }}</td>
+        <td>₹{{ tx.amount }}</td>
+        <td>{{ tx.status }}</td>
+        <td>{{ tx.paid_on }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">No transactions found</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

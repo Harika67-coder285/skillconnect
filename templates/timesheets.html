@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timesheets</title>
+</head>
+<body>
+
+<h2>Timesheets</h2>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Date</th>
+        <th>Hours Worked</th>
+        <th>Description</th>
+    </tr>
+
+    {% for sheet in timesheets %}
+    <tr>
+        <td>{{ sheet.date }}</td>
+        <td>{{ sheet.hours_worked }}</td>
+        <td>{{ sheet.description }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No timesheets submitted</td></tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+<h3>Total Time Spent on Project: {{ total_hours }} hours</h3>
+
+</body>
+</html>

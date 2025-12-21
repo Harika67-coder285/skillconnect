@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+
+<h2>Chat</h2>
+
+<div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll;">
+    {% for msg in messages %}
+        <p>
+            <strong>
+                {% if msg.sender_recruiter %}
+                    Recruiter
+                {% else %}
+                    Freelancer
+                {% endif %}
+            </strong> :
+            {{ msg.message }}
+
+            {% if msg.file %}
+                <br>
+                <a href="{{ msg.file.url }}" target="_blank">📎 View File</a>
+            {% endif %}
+        </p>
+        <hr>
+    {% empty %}
+        <p>No messages yet.</p>
+    {% endfor %}
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <textarea name="message" placeholder="Type message..." required></textarea><br><br>
+    <input type="file" name="file"><br><br>
+    <button type="submit">Send</button>
+</form>
+
+</body>
+</html>

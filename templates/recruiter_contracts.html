@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {% for c in contracts %}
+<div class="card p-3 mb-2">
+    <strong>{{ c.freelancer.full_name }}</strong><br>
+    Amount: ₹{{ c.agreed_amount }} <br>
+
+    {% if c.status == "accepted" %}
+        <span class="badge bg-success">Accepted</span>
+    {% elif c.status == "pending" %}
+        <span class="badge bg-warning">Waiting for Freelancer</span>
+    {% elif c.status == "rejected" %}
+        <span class="badge bg-danger">Rejected</span>
+    {% endif %}
+</div>
+{% endfor %}
+
+</body>
+</html>

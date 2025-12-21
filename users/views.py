@@ -14,6 +14,44 @@ def chatbox(request):
     return render(request,"chatbox.html")
 def home(request): return render(request, "index.html")
 def browse_page(request): return render(request, "browse.html")
+from django.shortcuts import render
+from .models import Freelancer
+
+def browse_freelancers(request):
+    # Only recruiters should access
+    if request.session.get("account_type") != "recruiter":
+        return render(request, "unauthorized.html")
+
+    freelancers = Freelancer.objects.filter(is_active=True)
+
+    # ---- Filters from GET params ----
+    skill = request.GET.get("skill")
+    experience = request.GET.get("experience")
+    location = request.GET.get("address")
+    min_rate = request.GET.get("min_rate")
+    max_rate = request.GET.get("max_rate")
+
+    if skill:
+        freelancers = freelancers.filter(skills__icontains=skill)
+
+    if experience:
+        freelancers = freelancers.filter(experience_level=experience)
+
+    if location:
+        freelancers = freelancers.filter(location__icontains=location)
+
+    if min_rate:
+        freelancers = freelancers.filter(hourly_rate__gte=min_rate)
+
+    if max_rate:
+        freelancers = freelancers.filter(hourly_rate__lte=max_rate)
+
+    context = {
+        "freelancers": freelancers,
+    }
+
+    return render(request, "browse.html", context)
+
 def how_it_works_page(request): return render(request, "howitworks.html")
 from django.shortcuts import render, redirect
 from .models import Freelancer, Recruiter
@@ -344,8 +382,7 @@ def my_projects(request):
 def client_requests(request):
     return render(request, "client_requests.html")
 
-def messages(request):
-    return render(request, "messages.html")
+
 def settings_page(request):
     return render(request, "settings_page.html")
 # users/views.py
@@ -472,66 +509,48 @@ def post_job(request):
 
     recruiter = Recruiter.objects.get(id=request.session["user_id"])
 
-    if request.method == "POST":
+    if request.method == 'POST':
         Job.objects.create(
             recruiter=recruiter,
-            title=request.POST.get("title"),
-            description=request.POST.get("description")
+            title=request.POST['title'],
+            description=request.POST['description'],
+            skills=request.POST['skills'],
+            work_type=request.POST['work_type'],
+            duration=request.POST['duration'],
+            experience_level=request.POST['experience_level'],
+            payment_type=request.POST['payment_type'],
+            attachment=request.FILES.get('attachment')
         )
-        return redirect("my_jobs")
+        return redirect('my_jobs')
 
-    return render(request, "post_job.html")
-def recruiter_applications(request):
-    if request.session.get("account_type") != "recruiter":
-        return redirect("login_page")
+    return render(request, 'post_job.html')
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Application
 
-    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+def recruiter_applications(request, job_id):
+    applications = Application.objects.filter(job_id=job_id)
 
-    applications = JobApplication.objects.filter(
-        job__recruiter=recruiter
-    ).select_related("job", "freelancer")
-
-    return render(request, "applications.html", {
+    return render(request, "job_applications.html", {
         "applications": applications
     })
-def update_application_status(request, app_id, action):
+
+
+def update_application_status(request, app_id):
+    if request.method == "POST":
+        application = get_object_or_404(Application, id=app_id)
+        new_status = request.POST.get("status")
+
+        application.status = new_status
+        application.save()
+
+    return redirect("recruiter_applications", job_id=application.job.id)
+
+def applications(request):
     if request.session.get("account_type") != "recruiter":
-        return redirect("login_page")
+        return redirect("home")
 
-    application = JobApplication.objects.get(id=app_id)
+    return render(request, "applications.html")
 
-    if action == "accept":
-        application.status = "accepted"
-        subject = "Application Accepted 🎉"
-        message = f"""
-Hi {application.freelancer.full_name},
-
-Congratulations! 🎉
-Your application for "{application.job.title}" has been accepted.
-
-Recruiter will contact you soon.
-"""
-    else:
-        application.status = "rejected"
-        subject = "Application Update"
-        message = f"""
-Hi {application.freelancer.full_name},
-
-Thank you for applying to "{application.job.title}".
-Unfortunately, your application was not selected.
-"""
-
-    application.save()
-
-    send_mail(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        [application.freelancer.email],
-        fail_silently=False,
-    )
-
-    return redirect("recruiter_applications")
 def apply_job(request, job_id):
     if request.session.get("account_type") != "freelancer":
         return redirect("login_page")
@@ -553,7 +572,12 @@ def my_jobs(request):
     recruiter = Recruiter.objects.get(id=request.session["user_id"])
     jobs = Job.objects.filter(recruiter=recruiter)
 
-    return render(request, "my_jobs.html", {"jobs": jobs})
+    context = {
+        "jobs": jobs,
+        "job_count": jobs.count()  # ✅ FIX
+    }
+    return render(request, "my_jobs.html", context)
+
 def job_applications(request, job_id):
     if request.session.get("account_type") != "recruiter":
         return redirect("login_page")
@@ -599,3 +623,449 @@ def delete_job(request, job_id):
         return redirect("my_jobs")
 
     return render(request, "confirm_delete_job.html", {"job": job})
+from django.shortcuts import render
+from .models import Freelancer
+
+def search_freelancers(request):
+    freelancers = Freelancer.objects.filter(is_active=True)
+
+    skill = request.GET.get('skill')
+    experience = request.GET.get('experience')
+    location = request.GET.get('location')
+    hourly_rate = request.GET.get('hourly_rate')
+
+    if skill:
+        freelancers = freelancers.filter(skills__icontains=skill)
+
+    if experience:
+        freelancers = freelancers.filter(experience_level=experience)
+
+    if location:
+        freelancers = freelancers.filter(location__icontains=location)
+
+    if hourly_rate:
+        freelancers = freelancers.filter(hourly_rate__lte=hourly_rate)
+
+    context = {
+        'freelancers': freelancers
+    }
+    return render(request, 'search_freelancers.html', context)
+
+def update_application_status(request, app_id):
+    application = Application.objects.get(id=app_id)
+
+    if request.method == 'POST':
+        application.status = request.POST['status']
+        application.save()
+
+    return redirect('view_applications', job_id=application.job.id)
+
+def interviews(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("home")
+
+    interviews = Interview.objects.select_related(
+        "application",
+        "application__freelancer",
+        "application__job"
+    ).all()
+
+    return render(request, "interviews.html", {
+        "interviews": interviews
+    })
+
+from .models import Interview
+
+def schedule_interview(request, application_id):
+    application = get_object_or_404(Application, id=application_id)
+
+    if request.method == "POST":
+        Interview.objects.create(
+            application=application,
+            interview_date=request.POST.get("date"),
+            interview_time=request.POST.get("time"),
+            mode=request.POST.get("mode")
+        )
+
+        application.status = "interview"
+        application.save()
+
+        return redirect("recruiter_applications", job_id=application.job.id)
+
+    return render(request, "schedule_interview.html", {
+        "application": application
+    })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Freelancer, Contract, Recruiter
+from .models import Notification
+
+from .models import Notification
+
+def create_direct_contract(request, freelancer_id):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+    freelancer = Freelancer.objects.get(id=freelancer_id)
+
+    if request.method == "POST":
+        contract = Contract.objects.create(
+            recruiter=recruiter,
+            freelancer=freelancer,
+            payment_type=request.POST["payment_type"],
+            agreed_amount=request.POST["amount"],
+            start_date=request.POST["start_date"],
+            status="pending",
+            is_active=False
+        )
+
+        # 🔔 Notify freelancer
+        Notification.objects.create(
+            freelancer=freelancer,
+            message=f"{recruiter.full_name} sent you a contract offer"
+        )
+
+        return redirect("contracts")
+
+    return render(request, "create_direct_contract.html", {"freelancer": freelancer})
+
+def accept_contract(request, contract_id):
+    if request.session.get("account_type") != "freelancer":
+        return redirect("login_page")
+
+    contract = Contract.objects.get(id=contract_id)
+    contract.status = "accepted"
+    contract.is_active = True
+    contract.save()
+
+    return redirect("freelancer_contracts")
+
+
+def reject_contract(request, contract_id):
+    if request.session.get("account_type") != "freelancer":
+        return redirect("login_page")
+
+    contract = Contract.objects.get(id=contract_id)
+    contract.status = "rejected"
+    contract.is_active = False
+    contract.save()
+
+    return redirect("freelancer_contracts")
+def recruiter_contracts(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+    contracts = Contract.objects.filter(recruiter=recruiter)
+
+    return render(request, "contracts.html", {
+        "contracts": contracts
+    })
+
+def freelancer_contracts(request):
+    if request.session.get("account_type") != "freelancer":
+        return redirect("login_page")
+
+    freelancer_id = request.session["user_id"]
+
+    contracts = Contract.objects.filter(freelancer_id=freelancer_id)
+
+    return render(request, "freelancer_contracts.html", {
+        "contracts": contracts
+    })
+
+
+def contract_action(request, contract_id):
+    if request.session.get("account_type") != "freelancer":
+        return redirect("login_page")
+
+    contract = Contract.objects.get(id=contract_id)
+
+    action = request.GET.get("action")
+
+    if action == "accept":
+        contract.status = "accepted"
+        contract.is_active = True
+        contract.save()
+
+    elif action == "reject":
+        contract.status = "rejected"
+        contract.is_active = False
+        contract.save()
+
+    return redirect("freelancer_contracts")
+
+def recruiter_dashboard(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+
+    jobs = Job.objects.filter(recruiter=recruiter)
+    applications = Application.objects.filter(job__recruiter=recruiter)
+
+    context = {
+        'jobs_count': jobs.count(),
+        'applications_count': applications.count(),
+        'accepted': applications.filter(status='accepted').count(),
+        'pending': applications.exclude(status__in=['accepted','rejected']).count(),
+        'rejected': applications.filter(status='rejected').count(),
+    }
+
+    return render(request, 'recruiter_dashboard.html', context)
+
+def reports(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["recruiter_id"])
+
+    payments = Payment.objects.filter(contract__recruiter=recruiter)
+
+    total_paid = payments.filter(status="paid").aggregate(models.Sum("amount"))["amount__sum"] or 0
+    pending = payments.filter(status="pending").aggregate(models.Sum("amount"))["amount__sum"] or 0
+
+    return render(request, "reports.html", {
+        "payments": payments,
+        "total_paid": total_paid,
+        "pending": pending
+    })
+
+from django.contrib.auth.decorators import login_required
+from .models import Contract
+
+@login_required
+def hired_talent(request):
+    contracts = Contract.objects.filter(
+        recruiter=request.user
+    ).select_related('freelancer')
+
+    return render(request, 'hired_talent.html', {
+        'contracts': contracts
+    })
+def analysis(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["recruiter_id"])
+
+    jobs = Job.objects.filter(recruiter=recruiter)
+    applications = Application.objects.filter(job__recruiter=recruiter)
+
+    return render(request, "analysis.html", {
+        "job_count": jobs.count(),
+        "proposal_count": applications.count(),
+        "accepted": applications.filter(status="accepted").count(),
+        "rejected": applications.filter(status="rejected").count(),
+        "pending": applications.exclude(status__in=["accepted", "rejected"]).count(),
+    })
+
+from django.shortcuts import render
+from django.db.models import Count
+from .models import Job, Application, Recruiter
+
+def recruiter_analysis(request):
+    recruiter = Recruiter.objects.get(email=request.session.get("email"))
+
+    jobs = Job.objects.filter(recruiter=recruiter)
+
+    total_jobs = jobs.count()
+
+    total_proposals = Application.objects.filter(job__in=jobs).count()
+
+    pending_proposals = Application.objects.filter(
+        job__in=jobs,
+        status__in=['applied', 'shortlisted', 'interview']
+    ).count()
+
+    accepted_proposals = Application.objects.filter(
+        job__in=jobs,
+        status='accepted'
+    ).count()
+
+    rejected_proposals = Application.objects.filter(
+        job__in=jobs,
+        status='rejected'
+    ).count()
+
+    context = {
+        'total_jobs': total_jobs,
+        'total_proposals': total_proposals,
+        'pending_proposals': pending_proposals,
+        'accepted_proposals': accepted_proposals,
+        'rejected_proposals': rejected_proposals,
+    }
+
+    return render(request, 'recruiter_analysis.html', context)
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Message, Recruiter, Freelancer
+from django.db.models import Q
+
+
+def chat_view(request, recruiter_id=None, freelancer_id=None):
+    recruiter = None
+    freelancer = None
+
+    if recruiter_id:
+        recruiter = get_object_or_404(Recruiter, id=recruiter_id)
+
+    if freelancer_id:
+        freelancer = get_object_or_404(Freelancer, id=freelancer_id)
+
+    messages = Message.objects.filter(
+        Q(sender_recruiter=recruiter, receiver_freelancer=freelancer) |
+        Q(sender_freelancer=freelancer, receiver_recruiter=recruiter)
+    ).order_by('created_at')
+
+    if request.method == "POST":
+        text = request.POST.get("message")
+        file = request.FILES.get("file")
+
+        Message.objects.create(
+            sender_recruiter=recruiter,
+            sender_freelancer=freelancer,
+            receiver_recruiter=recruiter,
+            receiver_freelancer=freelancer,
+            message=text,
+            file=file
+        )
+        return redirect(request.path)
+
+    return render(request, "chatbot.html", {
+        "messages": messages,
+        "recruiter": recruiter,
+        "freelancer": freelancer
+    })
+from django.shortcuts import render
+from django.utils import timezone
+from datetime import timedelta
+from .models import Payment, Contract
+
+
+def financial_reports(request, recruiter_id):
+    today = timezone.now()
+    week_start = today - timedelta(days=7)
+
+    # Weekly summary
+    weekly_payments = Payment.objects.filter(
+        contract__recruiter_id=recruiter_id,
+        paid_on__gte=week_start
+    )
+
+    weekly_total_paid = weekly_payments.filter(status='paid').aggregate(
+        total=models.Sum('amount')
+    )['total'] or 0
+
+    weekly_pending = weekly_payments.filter(status='pending').aggregate(
+        total=models.Sum('amount')
+    )['total'] or 0
+
+    # Transaction history
+    transactions = Payment.objects.filter(
+        contract__recruiter_id=recruiter_id
+    ).order_by('-paid_on')
+
+    # Overall totals
+    total_paid = Payment.objects.filter(
+        contract__recruiter_id=recruiter_id,
+        status='paid'
+    ).aggregate(total=models.Sum('amount'))['total'] or 0
+
+    total_pending = Payment.objects.filter(
+        contract__recruiter_id=recruiter_id,
+        status='pending'
+    ).aggregate(total=models.Sum('amount'))['total'] or 0
+
+    return render(request, "reports.html", {
+        "weekly_total_paid": weekly_total_paid,
+        "weekly_pending": weekly_pending,
+        "transactions": transactions,
+        "total_paid": total_paid,
+        "total_pending": total_pending
+    })
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import Contract, Timesheet
+
+
+def work_dashboard(request, recruiter_id):
+    # Active contracts
+    active_contracts = Contract.objects.filter(
+        recruiter_id=recruiter_id,
+        is_active=True
+    )
+
+    # Completed contracts
+    completed_contracts = Contract.objects.filter(
+        recruiter_id=recruiter_id,
+        is_active=False
+    )
+
+    return render(request, "work_dashboard.html", {
+        "active_contracts": active_contracts,
+        "completed_contracts": completed_contracts,
+    })
+
+def contracts(request):
+    if request.session.get("account_type") != "recruiter":
+        return redirect("login_page")
+
+    recruiter = Recruiter.objects.get(id=request.session["user_id"])
+    contracts = Contract.objects.filter(recruiter=recruiter)
+
+    return render(request, "contracts.html", {
+        "contracts": contracts
+    })
+def messages(request):
+    return render(request, "messages.html")
+
+def contract_timesheets(request, contract_id):
+    timesheets = Timesheet.objects.filter(contract_id=contract_id)
+
+    total_hours = timesheets.aggregate(
+        total=Sum('hours_worked')
+    )['total'] or 0
+
+    return render(request, "timesheets.html", {
+        "timesheets": timesheets,
+        "total_hours": total_hours
+    })
+from .models import Message
+
+def chat(request, recruiter_id, freelancer_id):
+    messages = Message.objects.filter(
+        sender_recruiter_id=recruiter_id,
+        receiver_freelancer_id=freelancer_id
+    ) | Message.objects.filter(
+        sender_freelancer_id=freelancer_id,
+        receiver_recruiter_id=recruiter_id
+    )
+
+    messages = messages.order_by("created_at")
+
+    if request.method == "POST":
+        Message.objects.create(
+            sender_recruiter_id=recruiter_id,
+            receiver_freelancer_id=freelancer_id,
+            message=request.POST.get("message"),
+            file=request.FILES.get("file")
+        )
+        return redirect("chat", recruiter_id=recruiter_id, freelancer_id=freelancer_id)
+
+    return render(request, "chat.html", {
+        "messages": messages
+    })
+from .models import Contract, Freelancer
+
+def freelancer_notifications(request):
+    if request.session.get("account_type") == "freelancer":
+        freelancer_id = request.session.get("user_id")
+        count = Contract.objects.filter(
+            freelancer_id=freelancer_id,
+            status="pending"
+        ).count()
+        return {"pending_contracts_count": count}
+
+    return {"pending_contracts_count": 0}

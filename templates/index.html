@@ -92,7 +92,52 @@
             <i class="bi bi-plus-lg"></i> Post Job
           </a>
         </li>
+        <li>
+          <a href="{%url 'contracts' %}">My Contracts</a>
+        </li>
+        <li class="dropdown">
+  <a href="#">
+    Notifications
+    {% if notifications %}
+      <span class="badge bg-danger">{{ notifications|length }}</span>
+    {% endif %}
+  </a>
+  <ul>
+    {% for n in notifications %}
+      <li>{{ n.message }}</li>
+    {% empty %}
+      <li>No new notifications</li>
+    {% endfor %}
+  </ul>
+</li>
+
         {% endif %}
+
+{% if request.session.account_type == "freelancer" %}
+<li class="dropdown">
+  <a href="#">
+    Notifications
+    {% if notification_count > 0 %}
+      <span class="badge bg-danger">{{ notification_count }}</span>
+    {% endif %}
+  </a>
+
+  <ul>
+    {% for n in freelancer_notifications %}
+      <li>
+        <a href="{% url 'freelancer_contracts' %}">
+          {{ n.message }}
+        </a>
+      </li>
+    {% empty %}
+      <li><span class="dropdown-item">No notifications</span></li>
+    {% endfor %}
+  </ul>
+  <li>
+  <a href="{%url 'freelancer_contracts'%}">Contract Requests</a>
+  </li>
+</li>
+{% endif %}
 
 
     <!-- Profile Avatar -->

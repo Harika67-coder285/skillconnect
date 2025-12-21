@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule Interview</title>
+</head>
+<body>
+
+<h2>Schedule Interview</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Date:</label>
+    <input type="date" name="date" required><br><br>
+
+    <label>Time:</label>
+    <input type="time" name="time" required><br><br>
+
+    <label>Mode:</label>
+    <select name="mode">
+        <option value="call">Call</option>
+        <option value="video">Video</option>
+        <option value="in_person">In Person</option>
+    </select><br><br>
+
+    <button type="submit">Schedule</button>
+</form>
+
+</body>
+</html>

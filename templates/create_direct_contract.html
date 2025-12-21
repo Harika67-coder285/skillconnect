@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Direct Contract</title>
+</head>
+<body>
+
+<h3>Hire {{ freelancer.full_name }} Directly</h3>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Payment Type</label>
+    <select name="payment_type" required>
+        <option value="hourly">Hourly</option>
+        <option value="fixed">Fixed</option>
+    </select><br><br>
+
+    <label>Agreed Amount</label>
+    <input type="number" name="amount" required><br><br>
+
+    <label>Start Date</label>
+    <input type="date" name="start_date" required><br><br>
+
+    <button type="submit">Send Contract</button>
+</form>
+
+</body>
+</html>

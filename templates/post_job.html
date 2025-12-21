@@ -1,66 +1,69 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post a Job</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Optional: Custom CSS -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .post-job-container {
-            max-width: 700px;
-            margin: 80px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .post-job-container h2 {
-            margin-bottom: 20px;
-            color: #343a40;
-            text-align: center;
-        }
-        label {
-            font-weight: 500;
-        }
-        textarea {
-            resize: none;
-        }
-        button {
-            width: 100%;
-        }
-    </style>
+<title>Post Job</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-<div class="post-job-container">
-    <h2>Post a New Job</h2>
+<div class="container mt-5">
+<h3>Post a Job</h3>
 
-    <form method="POST">
-        {% csrf_token %}
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
 
-        <div class="mb-3">
-            <label for="title" class="form-label">Job Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter job title" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Job Description</label>
-            <textarea class="form-control" id="description" name="description" rows="6" placeholder="Enter job description" required></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
-    </form>
+<div class="mb-3">
+<label>Job Role</label>
+<input type="text" name="title" class="form-control" required>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<div class="mb-3">
+<label>Required Skills</label>
+<input type="text" name="skills" class="form-control" placeholder="Python, React">
+</div>
 
+<div class="mb-3">
+<label>Work Type</label>
+<select name="work_type" class="form-control">
+<option value="short">Short-term</option>
+<option value="long">Long-term</option>
+</select>
+</div>
+
+<div class="mb-3">
+<label>Duration</label>
+<input type="text" name="duration" class="form-control" placeholder="3 months">
+</div>
+
+<div class="mb-3">
+<label>Experience Level</label>
+<select name="experience_level" class="form-control">
+<option value="fresher">Fresher</option>
+<option value="experienced">Experienced</option>
+</select>
+</div>
+
+<div class="mb-3">
+<label>Payment Type</label>
+<select name="payment_type" class="form-control">
+<option value="hourly">Hourly</option>
+<option value="fixed">Fixed</option>
+</select>
+</div>
+
+<div class="mb-3">
+<label>Description</label>
+<textarea name="description" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+<label>Upload File (PDF)</label>
+<input type="file" name="document" class="form-control">
+</div>
+
+<button class="btn btn-primary">Post Job</button>
+</form>
+</div>
 </body>
 </html>

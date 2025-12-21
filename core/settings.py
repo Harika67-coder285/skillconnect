@@ -55,6 +55,8 @@ TEMPLATES = [
                 # ⭐️ ADD THIS LINE ⭐️
                 'users.context_processors.app_user',
                 "users.context_processors.recruiter_job_count",
+    'users.context_processors.freelancer_notifications',
+
 
             ],
         },

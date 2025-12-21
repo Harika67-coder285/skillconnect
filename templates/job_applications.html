@@ -1,26 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <title>Applications</title>
 </head>
 <body>
-  <h2>Applications for {{ job.title }}</h2>
+
+<h2>Job Applications</h2>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Freelancer</th>
+    <th>Status</th>
+    <th>Update</th>
+</tr>
 
 {% for app in applications %}
-<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-    <p><strong>Freelancer:</strong> {{ app.freelancer.full_name }}</p>
-    <p><strong>Cover Letter:</strong> {{ app.cover_letter }}</p>
-    <p><strong>Status:</strong> {{ app.status }}</p>
-
-    <a href="{% url 'update_application_status' app.id 'accepted' %}">Accept</a> |
-    <a href="{% url 'update_application_status' app.id 'rejected' %}">Reject</a>
-</div>
-{% empty %}
-<p>No applications yet.</p>
+<tr>
+    <td>{{ app.freelancer.full_name }}</td>
+    <td>{{ app.status }}</td>
+    <td>
+        <form method="POST" action="{% url 'update_application_status' app.id %}">
+            {% csrf_token %}
+            <select name="status">
+                <option value="applied">Applied</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="interview">Interview</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <button type="submit">Save</button>
+        </form>
+    </td>
+</tr>
 {% endfor %}
-
+</table>
 
 </body>
 </html>
